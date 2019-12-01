@@ -1,0 +1,123 @@
+<html>
+    <head>
+        <div id="div_load"; style="height: 50px;"></div>
+        <div style="display: flex;">
+            <div style="width: auto;">
+                <p> Original point cloud </p>
+                <div class="canvas" id="div_Left"></div>
+            </div>
+            <div style="width: auto;margin-left: 20%;">
+                <p> Obtained Convex hull </p>
+                <div class="canvas" id="div_Right"></div>
+            </div>
+        </div>
+
+        <style>
+            div{
+                height: auto;
+                width: 100%;
+            }
+            .canvas{
+                border-style: solid;
+                border-width: 3px;
+                border-color: black;
+                height: 400px;
+                width: 400px;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="./src/Log_importer.js"></script>
+        <script src="./src/webgl-utils.js"></script>
+        <script src="./src/Plot.js"></script>
+
+        <script> 
+            function append_text(involved_div, message){
+                let par = document.createElement("p");
+                par.innerHTML = message;
+                involved_div.appendChild(par);
+            }
+
+            class Canvas_hndlr{
+                constructor(){
+                    this.div_cloud = document.getElementById("div_Left");
+                    this.div_CH = document.getElementById("div_Right");
+                    
+                    this.plot_cloud = null;
+                    this.plot_CH = null;
+                };
+
+                update(centered_Data, Size){
+                    if(this.plot_cloud !== null){
+                        this.div_cloud.removeChild(this.plot_cloud.get_canvas());
+                        this.div_CH.removeChild(this.plot_CH.get_canvas());
+                        delete this.plot_cloud;
+                        delete this.plot_CH;
+                    }
+
+                    function get_vertices(){
+                        let ii;
+                        let res = [];
+                        for(let i=0; i<centered_Data.Cloud.length; i++){
+                            for(ii=0; ii<centered_Data.Cloud[i].length; ii++){
+                                res.push(centered_Data.Cloud[i][ii]);
+                            }
+                        }
+                        return res;
+                    }
+
+                    //point cloud
+                    // this.plot_cloud = new WebGL_Plot([400, 400], 3.0 * Size * 0.5, 3.0 * Size * 0.5);
+                    // this.div_cloud.appendChild(this.plot_cloud.get_canvas());
+                    // this.plot_cloud.add_Points(get_vertices(), [255, 0,0, 255]);
+                    // this.plot_cloud.move_camera([0,0] , Size);
+                    // this.plot_cloud.drawScene();
+                    console.log(get_vertices());
+
+                    let edges = [];
+                    function get_triangles(){
+                        let triangles = [];
+                        let ii;
+                        let edge;
+                        for(let i=0; i<centered_Data.Index.length; i++){
+                            edge = [];
+                            for(ii=0;ii<3; ii++){
+                                edge.push(centered_Data.Cloud[centered_Data.Index[i][ii]][0]);
+                                edge.push(centered_Data.Cloud[centered_Data.Index[i][ii]][1]);
+                                edge.push(centered_Data.Cloud[centered_Data.Index[i][ii]][2]);
+                            }
+                            edges.push(edge);
+                            for(ii = 0; ii<edge.length; ii++){
+                                triangles.push(edge[ii]);
+                            }
+                        }
+                        return triangles;
+                    }
+
+                    //convex hull
+                    // this.plot_CH = new WebGL_Plot([400, 400], 3.0 * Size * 0.5, 3.0 * Size * 0.5);
+                    // this.div_CH.appendChild(this.plot_CH.get_canvas());
+                    // this.plot_CH.add_Mesh(get_triangles(), [0, 255,0, 255]);
+                    // for(let i=0; i<edges.length; i++){
+                    //     this.plot_CH.add_Segments(edges[i], [255, 255,255, 255]);
+                    // }
+                    // this.plot_CH.move_camera([0,0] , Size);
+                    // this.plot_CH.drawScene();
+                    console.log(get_triangles());
+                    console.log(edges);
+
+                };
+            }
+        </script>
+
+        <script>
+
+            let handler = new Canvas_hndlr();
+
+            let uploader = get_loader(function(Centered_Data, Size) { handler.update(Centered_Data, Size); });
+            document.getElementById("div_load").appendChild(uploader);
+
+        </script>
+
+    </body>
+</html>
