@@ -11,6 +11,7 @@
 
 #include <list>
 
+//this is just an example of typename to use for representing 3d coordiante. Since FastQHull is a template class, you can feel free to define and use the one you prefer
 class V {
 public:
 	V(const float& X, const float& Y, const float& Z) { this->_x = X; this->_y = Y; this->_z = Z; };

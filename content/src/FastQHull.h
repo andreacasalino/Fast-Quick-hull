@@ -11,7 +11,7 @@
 
 #include <list>
 /* in case OpenMP (https://en.wikipedia.org/wiki/OpenMP) is enabled, Fast_QHull is automatically built in the parallel computaion mode, using a 
-number of threads equal to the number of cores available. See also README.pdf
+number of threads equal to the number of cores available. See also Fast_QHull.pdf
 */
 #if defined(_OPENMP)
 #include <omp.h>
@@ -38,17 +38,17 @@ public:
 	Fast_QHull() { this->Vertices = NULL;  };
 
 	/** \brief Use this for computing a new convex hull.
-	* \details The passed cloud is analyzed and the incidences (see README.pdf) of the convex hull are internally stored. 
+	* \details The passed cloud is analyzed and the incidences (see Fast_QHull.pdf) of the convex hull are internally stored. 
 	For accessing the incidences use Fast_QHull::Get_Incidences, while the normals of the facet can be obtained by invoking 
 	Fast_QHull::Get_Normals (the same order of facets is assumed for the incidences and the normals). 
-	* @param[in] new_set_of_vertices The list of vertices characterizing the point cloud to consider for the convex hull computation (Is the cloud C in the README.pdf)
-	* @param[in] max_iterations The maximum number of iterations to consider for updating the convex hull (see README.pdf). Infinity is assumed as default, 
+	* @param[in] new_set_of_vertices The list of vertices characterizing the point cloud to consider for the convex hull computation (Is the cloud C in the Fast_QHull.pdf)
+	* @param[in] max_iterations The maximum number of iterations to consider for updating the convex hull (see Fast_QHull.pdf). Infinity is assumed as default, 
 	passing 0: the algorithm stops only after the convex hull is completely obtained
 	*/
 	void Compute_new_Convex_Hull(const std::list<V>* new_set_of_vertices, const size_t& max_iterations = 0);
 
 	/** \brief Returns the incidences (see the documentation) of the convex hull triangulation.
-	* \details The incidences are meant here as the positions of the vertex in the cloud passed in Fast_QHull::Compute_new_Convex_Hull. See also README.pdf
+	* \details The incidences are meant here as the positions of the vertex in the cloud passed in Fast_QHull::Compute_new_Convex_Hull. See also Fast_QHull.pdf
 	The incidences are computed and internally stored after callling Fast_QHull::Compute_new_Convex_Hull. Therefore,
 	when this function is invoked, the incidences of the convex hull of the last passed cloud are returned. In case the convex hull computation
 	was not successfull, an empty list is returned.
