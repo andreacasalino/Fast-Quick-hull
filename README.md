@@ -6,4 +6,4 @@ The functionalities for the convex hull computation are all contained in ./conte
 
 When compiling FastQHull with OpenMP enabled, the multithreaded version is automatically activated.
 
-If you are interested in knowing the theory behind the code refers to the .pdf contained in ./content/doc/
+If you are interested in knowing the theory behind the code refers to the .pdf contained in ./content/Fast_QHull.pdf

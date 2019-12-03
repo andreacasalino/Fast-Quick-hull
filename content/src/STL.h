@@ -1,6 +1,6 @@
 /**
  * Author:    Andrea Casalino
- * Created:   11.05.2009
+ * Created:   03.12.2019
 *
 * report any bug to andrecasa91@gmail.com.
  **/
@@ -31,7 +31,7 @@ void splitta_riga(std::string& riga, std::list<std::string>* slices) {
 
 }
 
-/** \brief Import an .STL file (https://en.wikipedia.org/wiki/STL_(file_format) as a point cloud o vertices.
+/** \brief Import an .STL file (https://en.wikipedia.org/wiki/STL_(file_format) as a point cloud of vertices.
 */
 void Import_Vertices(std::list<V>* imported_vertices , const std::string& file_location) {
 

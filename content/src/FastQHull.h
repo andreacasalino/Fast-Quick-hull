@@ -1,6 +1,6 @@
 /**
  * Author:    Andrea Casalino
- * Created:   11.05.2009
+ * Created:   03.12.2019
 *
 * report any bug to andrecasa91@gmail.com.
  **/
@@ -11,7 +11,7 @@
 
 #include <list>
 /* in case OpenMP (https://en.wikipedia.org/wiki/OpenMP) is enabled, Fast_QHull is automatically built in the parallel computaion mode, using a 
-number of threads equal to the number of cores available
+number of threads equal to the number of cores available. See also README.pdf
 */
 #if defined(_OPENMP)
 #include <omp.h>
@@ -37,25 +37,27 @@ class Fast_QHull {
 public:
 	Fast_QHull() { this->Vertices = NULL;  };
 
-	/** \brief Use this for computing a new convecx hull.
-	* \details The passed cloud is analyzed and the incidences of the convex hull are internally stored. 
-	For accessing the incidences use Fast_QHull::Get_Incidences, while the normals of the facet can be obtained by invokying 
+	/** \brief Use this for computing a new convex hull.
+	* \details The passed cloud is analyzed and the incidences (see README.pdf) of the convex hull are internally stored. 
+	For accessing the incidences use Fast_QHull::Get_Incidences, while the normals of the facet can be obtained by invoking 
 	Fast_QHull::Get_Normals (the same order of facets is assumed for the incidences and the normals). 
-	* @param[in] new_set_of_vertices The list of vertices characterizing the point cloud to consider for the convex hull computation
-	* @param[in] max_iterations The maximum number of iterations to use for computing the triangulation (Infinity is assumed as default, passing 0)
+	* @param[in] new_set_of_vertices The list of vertices characterizing the point cloud to consider for the convex hull computation (Is the cloud C in the README.pdf)
+	* @param[in] max_iterations The maximum number of iterations to consider for updating the convex hull (see README.pdf). Infinity is assumed as default, 
+	passing 0: the algorithm stops only after the convex hull is completely obtained
 	*/
 	void Compute_new_Convex_Hull(const std::list<V>* new_set_of_vertices, const size_t& max_iterations = 0);
 
-	/** \brief Returns the incidences of the convex hull triangulation.
-	* \details The incidences are computed and internally stored after callling Fast_QHull::Compute_new_Convex_Hull. Therefore,
-	when this function is invoked, the incidences of the convex hull of the last passed cloud are returned. In case the cinvex hull computation
-	was not successfull, an empty list is returned
+	/** \brief Returns the incidences (see the documentation) of the convex hull triangulation.
+	* \details The incidences are meant here as the positions of the vertex in the cloud passed in Fast_QHull::Compute_new_Convex_Hull. See also README.pdf
+	The incidences are computed and internally stored after callling Fast_QHull::Compute_new_Convex_Hull. Therefore,
+	when this function is invoked, the incidences of the convex hull of the last passed cloud are returned. In case the convex hull computation
+	was not successfull, an empty list is returned.
 	* @param[out] indexes The list of incidences characterizing the convex hull
 	*/
 	void Get_Incidences(std::list<std::list<size_t>>* indexes) const;
 
 	/** \brief Similar to Fast_QHull::Get_Incidences(std::list<std::list<size_t>>* indexes).
-	* \details The incidences are stored in a vector of positions, which is allocated internally with a malloc operation and then returned. Remember to
+	* \details Here the incidences are stored in a vector of positions, which is allocated internally with a malloc operation and then returned. Remember to
 	deallocate the buffer of positions after having use it. In case the cinvex hull computation was not successfull, a NULL result is returned
 	* @param[out] return The list of incidences characterizing the convex hull
 	* @param[out] numb_of_facets the number of facets
@@ -64,7 +66,7 @@ public:
 
 	/** \brief Returns the incidences of the convex hull triangulation.
 	* \details The incidences are computed and internally stored after callling Fast_QHull::Compute_new_Convex_Hull. Therefore,
-	when this function is invoked, the incidences of the convex hull of the last passed cloud are returned.  In case the cinvex hull computation
+	when this function is invoked, the incidences of the convex hull of the last passed cloud are returned.  In case the convex hull computation
 	was not successfull, an empty list is returned
 	* @param[out] indexes The list of incidences characterizing the convex hull
 	*/
