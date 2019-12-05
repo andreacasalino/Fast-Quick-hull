@@ -10,7 +10,6 @@
 #define __HULL_H__
 
 #include <list>
-#include "../src/Vector3d_basic.h"
 
 #define HULL_GEOMETRIC_TOLLERANCE (float)1e-3
 
