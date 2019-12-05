@@ -22,7 +22,7 @@ int main() {
 
 	//compute the convex hull and put the info in a log file (check the initial commands inside Log_as_JSON_CovexHull
 	// for understanding how to use Fast_QHull)
-	Log_CovexHull( imported_cloud , "../Result_visualization/Log");
+	Log_as_JSON_CovexHull( imported_cloud , "../Result_visualization/Log"); 
 
 	system("pause");
 	return 0;
