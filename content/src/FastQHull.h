@@ -94,11 +94,11 @@ private:
 		size_t					Furthest_Pos;
 		float						Dist_Furthest_vertex;
 	};
-	class Politope : public Hull<Facet> {
+	class Politope : public Hull<Facet, V> {
 	public:
-		Politope(const V* A, const V* B, const  V* C, const V* D, const size_t& A_id, const size_t& B_id, const size_t& C_id, const size_t& D_id ) : Hull<Facet>(A, B, C, D, A_id, B_id, C_id, D_id) {};
+		Politope(const V* A, const V* B, const  V* C, const V* D, const size_t& A_id, const size_t& B_id, const size_t& C_id, const size_t& D_id ) : Hull<Facet, V>(A, B, C, D, A_id, B_id, C_id, D_id) {};
 		std::list<Facet>* get_facets() { return &this->Facets;  };
-		void Update_Hull(Facet* starting_facet_for_expansion, std::list<Facet*>* cone) { this->Hull<Facet>::__Update_Hull(starting_facet_for_expansion->Furthest_vertex, starting_facet_for_expansion, starting_facet_for_expansion->Furthest_Pos, cone); };
+		void Update_Hull(Facet* starting_facet_for_expansion, std::list<Facet*>* cone) { this->Hull<Facet,V>::__Update_Hull(starting_facet_for_expansion->Furthest_vertex, starting_facet_for_expansion, starting_facet_for_expansion->Furthest_Pos, cone); };
 	};
 
 	void __Compute_new_Convex_Hull_Master_thread(const size_t& max_iterations);
@@ -335,13 +335,7 @@ void Fast_QHull<V>::__Compute_new_Convex_Hull_Master_thread(const size_t& max_it
 	}
 
 
-	size_t Iterations_to_adopt, k_iter = 4;
-	if (max_iterations == 0)
-		Iterations_to_adopt = 0;
-	else if (max_iterations <= 4)
-		return;
-	else
-		Iterations_to_adopt = max_iterations - 4;
+	size_t  k_iter = 1;
 
 	//expand the initial thetraedron. Stop when there are no more facet expandable
 	auto Facets = this->politope->get_facets();
@@ -382,7 +376,7 @@ void Fast_QHull<V>::__Compute_new_Convex_Hull_Master_thread(const size_t& max_it
 		}
 
 		k_iter++;
-		if (k_iter == Iterations_to_adopt) break;
+		if (k_iter == max_iterations) break;
 	}
 
 }

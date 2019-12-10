@@ -21,15 +21,22 @@
 //	const V*				B; //pointer of the vertex B
 //	const V*				C; //pointer of the vertex C
 //
-//size_t					id_A;// identifief of vertex A(if not passed 0 for all points is assumed)
-//size_t					id_B;// identifief of vertex A(if not passed 0 for all points is assumed)
-//size_t					id_C;// identifief of vertex A(if not passed 0 for all points is assumed)
+//size_t					id_A;// identifier of vertex A(if not passed 0 for all points is assumed)
+//size_t					id_B;// identifier of vertex B(if not passed 0 for all points is assumed)
+//size_t					id_C;// identifier of vertex C(if not passed 0 for all points is assumed)
 //
 //	float						N[3]; //outer normal 
 //
 //	Facet*				Neighbour[3]; // AB, BC, CA
 //};
-template<typename Facet>
+
+//V should be a description of a 3d vector containing at least 3 const getters of the coordinates
+//V{
+// const float& x() const;
+// const float& y() const;
+// const float& z() const;
+//}
+template<typename Facet, typename V>
 class Hull {
 public:
 	Hull(const V* A, const V* B, const  V* C, const V* D, const size_t& A_id = 0, const size_t& B_id = 0, const size_t& C_id = 0, const size_t& D_id = 0 ) { this->__init_thetraedron(A, B, C, D, A_id, B_id, C_id, D_id); };
@@ -56,8 +63,8 @@ private:
 ///////////////////////////////////////////////////////
 
 
-template<typename Facet>
-void Hull<Facet>::__init_thetraedron(const V* A, const  V* B, const V* C, const  V* D, const size_t& A_id, const size_t& B_id, const size_t& C_id, const size_t& D_id) {
+template<typename Facet, typename V>
+void Hull<Facet, V>::__init_thetraedron(const V* A, const  V* B, const V* C, const  V* D, const size_t& A_id, const size_t& B_id, const size_t& C_id, const size_t& D_id) {
 
 	//check the thetraedron has a non zero volume
 	float delta_1[3];
@@ -120,8 +127,8 @@ void Hull<Facet>::__init_thetraedron(const V* A, const  V* B, const V* C, const 
 
 }
 
-template<typename Facet>
-void Hull<Facet>::__Recompute_Normal(Facet* facet) {
+template<typename Facet, typename V>
+void Hull<Facet, V>::__Recompute_Normal(Facet* facet) {
 
 	float delta1[3], delta2[3];
 	delta1[0] = facet->A->x() - facet->C->x();
@@ -163,8 +170,8 @@ void Hull<Facet>::__Recompute_Normal(Facet* facet) {
 
 }
 
-template<typename Facet>
-void Hull<Facet>::__Append_facet(const V* vertexA, const V* vertexB, const V* vertexC, const size_t& A_id, const size_t& B_id, const size_t& C_id) {
+template<typename Facet, typename V>
+void Hull<Facet, V>::__Append_facet(const V* vertexA, const V* vertexB, const V* vertexC, const size_t& A_id, const size_t& B_id, const size_t& C_id) {
 
 	Facet new_face;
 	new_face.bVisible = false;
@@ -183,8 +190,8 @@ void Hull<Facet>::__Append_facet(const V* vertexA, const V* vertexB, const V* ve
 
 }
 
-template<typename Facet>
-void Hull<Facet>::__Replace(Facet* involved_facet, Facet* old_neigh, Facet* new_neigh) {
+template<typename Facet, typename V>
+void Hull<Facet, V>::__Replace(Facet* involved_facet, Facet* old_neigh, Facet* new_neigh) {
 	if (old_neigh == involved_facet->Neighbour[0]) involved_facet->Neighbour[0] = new_neigh;
 	else {
 		if (old_neigh == involved_facet->Neighbour[1]) involved_facet->Neighbour[1] = new_neigh;
@@ -192,8 +199,8 @@ void Hull<Facet>::__Replace(Facet* involved_facet, Facet* old_neigh, Facet* new_
 	}
 };
 
-template<typename Facet>
-void Hull<Facet>::__Update_Hull(const V* vertex_of_new_cone, Facet* starting_facet_for_expansion, const size_t& vertex_id, std::list<Facet*>* created_cone) {
+template<typename Facet, typename V>
+void Hull<Facet, V>::__Update_Hull(const V* vertex_of_new_cone, Facet* starting_facet_for_expansion, const size_t& vertex_id, std::list<Facet*>* created_cone) {
 
 	starting_facet_for_expansion->bVisible = true;
 	const V* Point = vertex_of_new_cone;
@@ -358,8 +365,8 @@ void Hull<Facet>::__Update_Hull(const V* vertex_of_new_cone, Facet* starting_fac
 
 }
 
-template<typename Facet>
-void Hull<Facet>::__Update_Hull(const V* Point, std::list<Facet*>* created_cone) {
+template<typename Facet, typename V>
+void Hull<Facet, V>::__Update_Hull(const V* Point, std::list<Facet*>* created_cone) {
 
 	auto it = this->Facets.begin();
 	auto it_end = this->Facets.end();
