@@ -17,7 +17,8 @@ int main() {
 	sample_cloud(&cloud, Numb_point);
 
 	//compute the convex hull and put the info in a log file (check the initial commands inside Log_as_JSON_CovexHull
-	// for understanding how to use Fast_QHull)
+	// for understanding how to use Fast_QHull).
+	// You can use the python script file Result_visualization/Main.py to display the  result
 	Log_as_JSON_CovexHull(cloud, "../Result_visualization/Log");
 
 
