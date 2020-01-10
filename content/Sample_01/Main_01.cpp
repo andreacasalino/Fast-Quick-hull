@@ -21,7 +21,5 @@ int main() {
 	// You can use the python script file Result_visualization/Main.py to display the  result
 	Log_as_JSON_CovexHull(cloud, "../Result_visualization/Log");
 
-
-	system("pause");
 	return 0;
 }
