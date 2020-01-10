@@ -14,7 +14,7 @@
 
 #define  GEOMETRIC_TOLLERANCE  float(HULL_GEOMETRIC_TOLLERANCE)
 
- /* in case OpenMP (https://en.wikipedia.org/wiki/OpenMP) is enabled, Fast_QHull is automatically built in the parallel computaion mode, using a
+ /* in case OpenMP (https://en.wikipedia.org/wiki/OpenMP) is enabled, Fast_QHull is automatically built in the parallel computation mode, using a
  number of threads equal to the number of cores available. See also Fast_QHull.pdf
  */
 #if defined(_OPENMP)

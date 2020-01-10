@@ -1,6 +1,7 @@
 All files are contained in ./content/
 
 The functionalities for the convex hull computation are all contained in ./content/src/FastQHull.h
+The code is cross-platform: only c++ standard libraries were used.
 
 ./content/Sample_01/Main_01.cpp reports an example considering a sampled point cloud
 
