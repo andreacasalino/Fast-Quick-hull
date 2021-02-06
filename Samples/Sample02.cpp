@@ -12,7 +12,11 @@ using namespace std;
 
 int main() {
 	// create a solver
-	qh::QuickHullSolver solver;
+	qh::QuickHullSolver solver
+#ifdef THREAD_POOL_ENABLED // try to use 4 threads for the pool
+		(4)
+#endif
+		;
 
 	//import the cloud from existing STL files
 	list<std::string> stlNames;
