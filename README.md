@@ -1,9 +1,9 @@
-This library contains the implementations of the **Quick Hull** algorithm, which is able to efficiently computes the **convex hull** of point cloud.
-If you are interested to the theoretical aspects behind the algorithm have a look at ./doc/Fast_QHull.pdf.
+This library contains the implementations of the **Quick Hull** algorithm, which is able to efficiently computes the **convex hull** of point clouds.
+If you are interested in the theoretical aspects behind the algorithm have a look at ./doc/Fast_QHull.pdf.
 
 This library is stand-alone and completely **cross platform**. Use [CMake](https://cmake.org) to configure the project.
 
-You can exploit an internal thread pool strategy to compute the **convex hull** of cloud made of thousands of points. 
+You can exploit an internal thread pool strategy to compute the **convex hull** of clouds made of thousands of points. 
 From the outside you just need to specify the size of the pool.
 However, if you don't need such an advance approach (and not compile redundant code), you can select **OFF** for the 
 [CMake](https://cmake.org) option **THREAD_POOL_OPT**. Beware, that by default such an option is set as **ON**.
@@ -16,7 +16,7 @@ You can use the script pyhton ./Samples/Plotter.py to visualize each result in a
  
 **Compile**
 
- * (**ONLY FOR USING THE THREAD POOL STRATEGY, OTHERWISE SKIP**) After cloning the library, if you want to use the thread pool approach, you need to initialize a git submodule by running the following commands from the root folder:
+ * (**ONLY FOR USING THE THREAD POOL STRATEGY, OTHERWISE SKIP**) After cloning the library you need to initialize a git submodule by running the following commands from the root folder:
    
    * `git submodule init`
    * `git submodule update`
