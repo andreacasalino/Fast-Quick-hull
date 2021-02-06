@@ -8,11 +8,9 @@
 #ifndef QHULL_QUICK_HULL_H
 #define QHULL_QUICK_HULL_H
 
-#include <list>
 #include <array>
 #include <vector>
 #include <Coordinate.h>
-#include <atomic>
 #include <Error.h>
 #ifdef THREAD_POOL_ENABLED
 #include <EquiPool.h>
@@ -223,7 +221,7 @@ namespace qh {
 		void _convexHull(std::vector<FacetIncidences>& indices, std::vector<Coordinate>* normals, CloudHandler& hndlr);
 
 	// data
-		std::atomic<std::size_t> maxIterations = 1000;
+		std::size_t maxIterations = 1000;
 #ifdef THREAD_POOL_ENABLED
 		std::shared_ptr<thpl::equi::Pool> pool;
 #endif

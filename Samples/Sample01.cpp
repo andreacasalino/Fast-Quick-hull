@@ -1,25 +1,37 @@
 /**
  * Author:    Andrea Casalino
  * Created:   03.12.2019
-*
-* report any bug to andrecasa91@gmail.com.
+ *
+ * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "../src/Log_utils.h"
+#include "src/Logger.h"
 using namespace std;
 
+void sampleCloud(std::list<Vector3d>& cloud, const std::size_t& size);
 
 int main() {
-
 	//randomly sample a point cloud of a given number of points
-	size_t Numb_point = 50;
-	list<V> cloud;
-	sample_cloud(&cloud, Numb_point);
+	list<Vector3d> cloud;
+	sampleCloud(cloud, 50);
 
-	//compute the convex hull and put the info in a log file (check the initial commands inside Log_as_JSON_CovexHull
-	// for understanding how to use Fast_QHull).
-	// You can use the python script file Result_visualization/Main.py to display the  result
-	Log_as_JSON_CovexHull(cloud, "../Result_visualization/Log");
+	// create a solver
+	qh::QuickHullSolver solver;
 
-	return 0;
+	// Compute the convex hull and put the info in a log file.
+	// You can use the python script Plotter.py to display the result
+	logConvexhull(solver, cloud, "Sample01.json");
+
+	return EXIT_SUCCESS;
+}
+
+float sample() {
+	return 2.f * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 1.f;
+}
+
+void sampleCloud(std::list<Vector3d>& cloud, const std::size_t& size) {
+	cloud.clear();
+	for (std::size_t k=0; k<size; ++k) {
+		cloud.emplace_back( sample(), sample(), sample());
+	}
 }
