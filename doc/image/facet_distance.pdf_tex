@@ -1,0 +1,69 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'facet_distance.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{365.42336502bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.91866713)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{facet_distance.pdf}}%
+    \put(0.68415131,0.42061148){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$n^j$}}}}%
+    \put(0.78461367,0.41914305){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\begin{minipage}{0.37111198\unitlength}\raggedright \end{minipage}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{facet_distance.pdf}}%
+    \put(0.39129212,0.57705389){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$C_1$}}}}%
+    \put(0.58354168,0.89008724){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$C_2$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{facet_distance.pdf}}%
+    \put(0,0.6212736){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$C_1 - V_a^j$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{facet_distance.pdf}}%
+    \put(0.05777386,0.86747736){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$C_2 - V_a^j$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{facet_distance.pdf}}%
+    \put(0.64784388,0.07421248){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$d(C_1,j)$}}}}%
+    \put(0.8118275,0.23746305){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$d(C_2,j)$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{facet_distance.pdf}}%
+    \put(0.31085949,0.0502701){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{facet $j$}}}}%
+    \put(0.83137368,0.00207328){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{}}}%
+  \end{picture}%
+\endgroup%
