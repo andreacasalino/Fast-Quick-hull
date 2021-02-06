@@ -1,0 +1,78 @@
+%% Creator: Inkscape inkscape 0.92.1, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'tetraedron.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{1304.46943224bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.29170489)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{tetraedron.pdf}}%
+    \put(0.04380865,0.01117094){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$x$}}}}%
+    \put(-0,0.02015779){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$y$}}}}%
+    \put(0.00888188,0.0542952){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$z$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{tetraedron.pdf}}%
+    \put(0.10439466,0.02568867){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{Farthest along $x$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{tetraedron.pdf}}%
+    \put(0.32719464,0.02401552){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{Farthest from $V_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{tetraedron.pdf}}%
+    \put(0.28039244,0.04797101){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$V_2$}}}}%
+    \put(0.22977805,0.13272484){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$V_1$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{tetraedron.pdf}}%
+    \put(0.60811333,0.24679008){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$V_3$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{tetraedron.pdf}}%
+    \put(0.9373815,0.05470875){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{$V_4$}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{tetraedron.pdf}}%
+    \put(0.53688788,0.02502505){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{Farthest from the}}}}%
+    \put(0.7774938,0.0259055){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{Farthest from the }}}}%
+    \put(0.12851752,0.28405953){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Step 1}}}%
+    \put(0.34958581,0.28493925){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Step 2}}}%
+    \put(0.58527428,0.2844994){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Step 3}}}%
+    \put(0.83623975,0.28537913){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{Step 4}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{tetraedron.pdf}}%
+    \put(0.53621096,0.00325068){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{line $\overline{V_{1,2}}$}}}}%
+    \put(0.77711605,0.00201009){\color[rgb]{0,0,0}\makebox(0,0)[lb]{\smash{\footnotesize{plane $\overline{V_{1,2,3}}$}}}}%
+  \end{picture}%
+\endgroup%

@@ -9,6 +9,7 @@
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
 import json
+import sys
 
 
 
@@ -65,7 +66,8 @@ def plot_CH(file, color, ax):
 
 
 
+logName = sys.argv[1]
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-plot_CH('Log', 'green', ax)
+plot_CH(logName, 'green', ax)
 plt.show()
