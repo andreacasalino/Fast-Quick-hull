@@ -1,0 +1,6 @@
+fix comments in header
+size_t -> std::size_t
+chiarire ruolo thread pool
+aggiornare doc pdf
+use thread pool
+fix README.md
