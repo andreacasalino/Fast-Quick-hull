@@ -34,7 +34,7 @@ std::list<Vector3d> importSTL(const std::string& stlFileName) {
 	std::string line;
 	std::list<std::string> slices;
 
-	size_t k;
+	std::size_t k;
 	std::getline(f, line);
 	float V_temp[3];
 	bool is_new;

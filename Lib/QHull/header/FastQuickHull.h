@@ -22,12 +22,20 @@ namespace qh {
 
 	class QuickHullSolver  {
 	public:
+#ifdef THREAD_POOL_ENABLED
+		/** @brief The size of the thread pool used internally by the solver
+		 * to compute the future convex hulls.
+		 */
+#endif
 		explicit QuickHullSolver(
 #ifdef THREAD_POOL_ENABLED
 		const std::size_t& poolSize = 0
 #endif
 		);
 
+		/** @brief Sets the maximum number of iterations used when
+		 * building the convex hull in convexHull(...)
+		 */
 		inline void setMaxIterations(const std::size_t& maxIterations) { this->maxIterations = maxIterations; };
 		
 		typedef std::array<std::size_t, 3> FacetIncidences;
@@ -39,7 +47,8 @@ namespace qh {
 				-> const float& V::x() const;
 				-> const float& V::y() const;
 				-> const float& V::z() const;
-		*/
+		 * @return the incidences of the facets composing the convex hull: each element is a triplet with the positions of the vertices in the cloud composing that facet
+		 */
 		template<typename V, typename Cloud>
 		std::vector<FacetIncidences> convexHull(const Cloud& cloud){
 			CloudHandlerConcrete<V, Cloud> hndl(cloud);
@@ -55,7 +64,10 @@ namespace qh {
 				-> const float& V::x() const;
 				-> const float& V::y() const;
 				-> const float& V::z() const;
-		*/
+		 * @return a pair of values:
+				-> first: the incidences of the facets composing the convex hull: each element is a triplet with the positions of the vertices in the cloud composing that facet
+				-> second: the outgoing normals of each facets. 
+		 */
 		template<typename V, typename Cloud>
 		std::pair<std::vector<FacetIncidences>
 		, std::vector<Coordinate>> convexHullWithNormals(const Cloud& cloud){
