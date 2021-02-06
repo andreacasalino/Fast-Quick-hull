@@ -25,6 +25,9 @@ namespace qh {
 #ifdef THREAD_POOL_ENABLED
 		/** @brief The size of the thread pool used internally by the solver
 		 * to compute the future convex hulls.
+		 * @param when passing 0, no pool is created and the standard serial
+		 * version of the algorithm will be exevuted when computing new
+		 * new convex hulls.
 		 */
 #endif
 		explicit QuickHullSolver(
