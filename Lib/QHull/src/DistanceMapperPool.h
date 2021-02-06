@@ -20,7 +20,7 @@ namespace qh {
 		void AddedChangedFacets(const std::list<const hull::Facet*>& added,const std::list<const hull::Facet*>& changed) const override;
 
     private:
-		std::mutex distanceMapMtx;
+		mutable std::mutex distanceMapMtx;
 		std::shared_ptr<thpl::equi::Pool> pool;
  	};
 #endif

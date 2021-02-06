@@ -24,7 +24,7 @@ namespace qh {
 
 	class QuickHullSolver  {
 	public:
-		QuickHullSolver(
+		explicit QuickHullSolver(
 #ifdef THREAD_POOL_ENABLED
 		const std::size_t& poolSize = 0
 #endif
@@ -190,9 +190,9 @@ namespace qh {
 				Coordinate Delta;
 				for(std::size_t k=0; k<this->cloud.size(); ++k) {
 					if(this->pointValidity[k]) {
-						Delta.x = it->x() - A.x;
-						Delta.y = it->y() - A.y;
-						Delta.z = it->z() - A.z;
+						Delta.x = this->cloud[k]->x() - A.x;
+						Delta.y = this->cloud[k]->y() - A.y;
+						Delta.z = this->cloud[k]->z() - A.z;
 						dist = dot(N, Delta);
 						if(dist > result.second) {
 							result.second = dist;
@@ -205,7 +205,7 @@ namespace qh {
 
 			Coordinate getCoordinate(const int& incidence) final {
 				const V* pV = this->cloud[incidence];
-				return Coordinate{pv->x(), pv->y(), pv->z()};
+				return Coordinate{pV->x(), pV->y(), pV->z()};
 			};
 
 			inline void invalidate(const int& incidence) {

@@ -11,7 +11,7 @@
 namespace qh {
 	QuickHullSolver::QuickHullSolver(
 #ifdef THREAD_POOL_ENABLED
-		const std::size_t& poolSize = 0
+		const std::size_t& poolSize
 #endif
 	) {
 #ifdef THREAD_POOL_ENABLED
@@ -38,19 +38,19 @@ namespace qh {
 		hull::Hull hull(tethraedron[0], tethraedron[1], tethraedron[2], tethraedron[3], obs.get());
 
 		std::map<const Coordinate*, std::size_t> indiceMap;
-		const std::map<const hull::Facet*, std::pair<float, int>>* distMap = &obs->getDistanceMap();
-		std::map<const hull::Facet*, std::pair<float, int>>::const_iterator farthest, itF;
+		const std::map<const hull::Facet*, std::pair<int, float>>* distMap = &obs->getDistanceMap();
+		std::map<const hull::Facet*, std::pair<int, float>>::const_iterator farthest, itF;
 		for(std::size_t iter = 0; iter<this->maxIterations; ++iter) {
 			if(distMap->empty()) break;
 			farthest = distMap->begin();
 			for(itF = farthest++; itF!=distMap->end(); ++itF) {
-				if(itF->second.first > farthest->second.first) {
+				if(itF->second.second > farthest->second.second) {
 					farthest = itF;
 				}
 			}
 			hull.UpdateHull(hndlr.getCoordinate(farthest->second.second),  *farthest->first);
 			indiceMap.emplace(&hull.getVertices().back(), static_cast<std::size_t>(farthest->second.second));
-			hndlr.invalidate(farthest->second.second);
+			hndlr.invalidate(farthest->second.first);
 		}
 
 		// get incidences
