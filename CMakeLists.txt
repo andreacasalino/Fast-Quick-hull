@@ -15,7 +15,6 @@ include(GroupSources)
 include(AutoCollect)
 
 option(THREAD_POOL_OPT "thread pool enabled (ON) or disabled (OFF)" ON)
-option(LOGGER_OPT "Diagnostic log enabled (ON) or disabled (OFF)" OFF)
 add_subdirectory(Lib)
 if(BUILD_SAMPLES)
     add_subdirectory(Samples)

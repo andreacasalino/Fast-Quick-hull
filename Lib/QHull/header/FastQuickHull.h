@@ -76,7 +76,7 @@ namespace qh {
 		};
 
 		template<typename V, typename Cloud>
-		class CloudHandlerConcrete {
+		class CloudHandlerConcrete : public CloudHandler {
 		public:
 			CloudHandlerConcrete(const Cloud& cloud) 
 				: cloud(tocCloud(cloud)) {

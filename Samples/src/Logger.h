@@ -13,7 +13,11 @@
  */
 class Vector3d {
 public:
-	Vector3d(const float& x, const float& y, const float& z);
+	Vector3d(const float& x, const float& y, const float& z) {
+		this->coordinates[0] = x;
+		this->coordinates[1] = y;
+		this->coordinates[2] = z;
+	};
 
 	inline float x() const { return this->coordinates[0]; };
 	inline float y() const { return this->coordinates[1]; };
@@ -25,6 +29,7 @@ private:
 
 #include <string>
 #include <FastQuickHull.h>
+#include <list>
 
 void logConvexhull(qh::QuickHullSolver& solver, const std::list<Vector3d>& cloud, const std::string& fileName);
 

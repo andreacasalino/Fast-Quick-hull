@@ -7,6 +7,7 @@
 
 #include "DistanceMapper.h"
 #include "DistanceMapperPool.h"
+#include <memory>
 
 namespace qh {
 	QuickHullSolver::QuickHullSolver(

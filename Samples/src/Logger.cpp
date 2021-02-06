@@ -57,7 +57,7 @@ void log(const C& c, const std::string& name, std::ofstream& f) {
 }
 
 void logConvexhull(qh::QuickHullSolver& solver, const std::list<Vector3d>& cloud, const std::string& fileName) {
-    auto ch = solver.convexHullWithNormals(cloud);
+    auto ch = solver.convexHullWithNormals<Vector3d, std::list<Vector3d>>(cloud);
 
     std::ofstream f(fileName);
     if(!f.is_open()) return;
