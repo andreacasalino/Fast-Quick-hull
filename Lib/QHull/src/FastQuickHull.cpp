@@ -63,7 +63,7 @@ namespace qh {
 			farthestPos = static_cast<std::size_t>(farthest->second.first);
 			hull.UpdateHull(hndlr.getCoordinate(farthest->second.first),  *farthest->first);
 			indiceMap.emplace(&hull.getVertices().back(), farthestPos);
-			hndlr.invalidate(farthestPos);
+			hndlr.invalidate(static_cast<int>(farthestPos));
 		}
 
 		// get incidences

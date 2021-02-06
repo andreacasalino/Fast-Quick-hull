@@ -164,15 +164,15 @@ namespace qh {
 				if(0.f == temp.first) {
 					invert(N);
 					temp = this->getFarthest(tethra[0], N);
-					if(0.f == temp.first) {
+					if(QHULL_GEOMETRIC_TOLLERANCE == temp.first) {
 						throw Error("found 0 volume cloud");
 					}
 				}
-				tethra[3] = this->getCoordinate(temp.second);
-				tethraIndex[3] = static_cast<std::size_t>(temp.second);
+				tethra[3] = this->getCoordinate(temp.first);
+				tethraIndex[3] = static_cast<std::size_t>(temp.first);
 
 				for (std::size_t k = 0; k < 4; ++k) {
-					this->invalidate(tethraIndex[k]);
+					this->invalidate(static_cast<int>(tethraIndex[k]));
 				}
 				return std::make_pair(tethra, tethraIndex);
 			}
@@ -198,7 +198,7 @@ namespace qh {
 						dist = dot(N, Delta);
 						if(dist > result.second) {
 							result.second = dist;
-							result.first = k;
+							result.first = static_cast<int>(k);
 						}
 					}
 				}
