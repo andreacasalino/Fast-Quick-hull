@@ -35,23 +35,35 @@ namespace qh {
 		obs = std::make_unique<DistanceMapper>(hndlr);
 #endif
 
-		std::array<Coordinate, 4> tethraedron = hndlr.getInitialTethraedron();
-		hull::Hull hull(tethraedron[0], tethraedron[1], tethraedron[2], tethraedron[3], obs.get());
-
+		std::pair<std::array<Coordinate, 4>, 
+		std::array<std::size_t, 4>> tethraedron = hndlr.getInitialTethraedron();
+		hull::Hull hull(tethraedron.first[0], tethraedron.first[1], tethraedron.first[2], tethraedron.first[3], obs.get());
 		std::map<const Coordinate*, std::size_t> indiceMap;
+		{
+			auto itV = hull.getVertices().begin();
+			for (std::size_t k = 0; k < 4; ++k) {
+				indiceMap.emplace(&(*itV), tethraedron.second[k]);
+				++itV;
+			}
+		}
+
 		const std::map<const hull::Facet*, std::pair<int, float>>* distMap = &obs->getDistanceMap();
 		std::map<const hull::Facet*, std::pair<int, float>>::const_iterator farthest, itF;
+		std::size_t farthestPos;
 		for(std::size_t iter = 0; iter<this->maxIterations; ++iter) {
 			if(distMap->empty()) break;
 			farthest = distMap->begin();
-			for(itF = farthest++; itF!=distMap->end(); ++itF) {
+			itF = farthest;
+			++itF;
+			for(itF; itF!=distMap->end(); ++itF) {
 				if(itF->second.second > farthest->second.second) {
 					farthest = itF;
 				}
 			}
-			hull.UpdateHull(hndlr.getCoordinate(farthest->second.second),  *farthest->first);
-			indiceMap.emplace(&hull.getVertices().back(), static_cast<std::size_t>(farthest->second.second));
-			hndlr.invalidate(farthest->second.first);
+			farthestPos = static_cast<std::size_t>(farthest->second.first);
+			hull.UpdateHull(hndlr.getCoordinate(farthest->second.first),  *farthest->first);
+			indiceMap.emplace(&hull.getVertices().back(), farthestPos);
+			hndlr.invalidate(farthestPos);
 		}
 
 		// get incidences

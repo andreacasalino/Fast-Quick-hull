@@ -11,7 +11,7 @@ namespace qh {
     void QuickHullSolver::DistanceMapper::AddedChangedFacets(const std::list<const hull::Facet*>& added,const std::list<const hull::Facet*>& changed) const {
         for(auto it = changed.begin(); it!=changed.end(); ++it) {
             auto farthest = this->hndlr.getFarthest(*(*it)->A, (*it)->N);
-            if(farthest.first > 0) {
+            if(farthest.second > QHULL_GEOMETRIC_TOLLERANCE) {
                 this->distanceMap.find(*it)->second = farthest;
             }
             else {
@@ -20,7 +20,7 @@ namespace qh {
         }
         for(auto it = added.begin(); it!=added.end(); ++it) {
             auto farthest = this->hndlr.getFarthest(*(*it)->A, (*it)->N);
-            if(farthest.first > 0) {
+            if(farthest.second > QHULL_GEOMETRIC_TOLLERANCE) {
                 this->distanceMap.emplace(*it, farthest);
             }
         }

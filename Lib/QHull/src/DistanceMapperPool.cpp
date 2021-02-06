@@ -19,7 +19,7 @@ namespace qh {
             this->pool->push([this, it](){
                 auto farthest = this->hndlr.getFarthest(*(*it)->A, (*it)->N);
                 std::lock_guard<std::mutex> mapLock(this->distanceMapMtx);
-                if(farthest.first > 0) {
+                if(farthest.second > QHULL_GEOMETRIC_TOLLERANCE) {
                     this->distanceMap.find(*it)->second = farthest;
                 }
                 else {
@@ -30,7 +30,7 @@ namespace qh {
         for(auto it = added.begin(); it!=added.end(); ++it) {
             this->pool->push([this, it](){
                 auto farthest = this->hndlr.getFarthest(*(*it)->A, (*it)->N);
-                if(farthest.first > 0) {
+                if(farthest.second > QHULL_GEOMETRIC_TOLLERANCE) {
                     std::lock_guard<std::mutex> mapLock(this->distanceMapMtx);
                     this->distanceMap.emplace(*it, farthest);
                 }

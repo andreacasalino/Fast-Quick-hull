@@ -27,7 +27,7 @@ if(THREAD_POOL_OPT)
 target_compile_definitions(${PROJECT_NAME} PUBLIC THREAD_POOL_ENABLED)
 target_link_libraries(
 ${PROJECT_NAME}
-    PRIVATE:
+    PUBLIC
 	thpl::Thread-Pool
 )
 endif()

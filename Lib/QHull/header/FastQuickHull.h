@@ -69,8 +69,8 @@ namespace qh {
 	private:
 		class CloudHandler {
 		public:
-			virtual std::array<Coordinate, 4> getInitialTethraedron() = 0;
-			virtual std::pair<float, int> getFarthest(const Coordinate& A, const Coordinate& N) = 0;
+			virtual std::pair<std::array<Coordinate, 4>, std::array<std::size_t, 4>> getInitialTethraedron() = 0;
+			virtual std::pair<int, float> getFarthest(const Coordinate& A, const Coordinate& N) = 0;
 			virtual Coordinate getCoordinate(const int& incidence) = 0;
 			virtual void invalidate(const int& incidence) = 0;
 		};
@@ -111,8 +111,9 @@ namespace qh {
 				return result;
 			}
 
-			std::array<Coordinate, 4> getInitialTethraedron() final {
+			std::pair<std::array<Coordinate, 4>, std::array<std::size_t, 4>> getInitialTethraedron() final {
 				std::array<Coordinate, 4> tethra;
+				std::array<std::size_t, 4> tethraIndex;
 			// 1: farthest from origin
 				std::size_t kMax =0, k;
 				float distMax = squaredDistance(ORIGIN , *this->cloud[0]), dist;
@@ -123,8 +124,8 @@ namespace qh {
 						distMax = dist;
 					}
 				}
-				tethra[0] = this->getCoordinate(kMax);
-				this->invalidate(kMax);
+				tethra[0] = this->getCoordinate(static_cast<int>(kMax));
+				tethraIndex[0] = kMax;
 			// 2: farthest from first point
 				kMax =0, k;
 				distMax = squaredDistance(tethra[0] , *this->cloud[0]);
@@ -138,8 +139,8 @@ namespace qh {
 				if(distMax < QHULL_GEOMETRIC_TOLLERANCE) {
 					throw Error("found 0 volume cloud");
 				}
-				tethra[1] = this->getCoordinate(kMax);
-				this->invalidate(kMax);
+				tethra[1] = this->getCoordinate(static_cast<int>(kMax));
+				tethraIndex[1] = kMax;
 			// 3: farthest from line of first and second
 				kMax =0, k;
 				distMax = squaredDistanceLine(tethra[0], tethra[1], *this->cloud[0]);
@@ -153,8 +154,8 @@ namespace qh {
 				if(distMax < QHULL_GEOMETRIC_TOLLERANCE) {
 					throw Error("found 0 volume cloud");
 				}
-				tethra[2] = this->getCoordinate(kMax);
-				this->invalidate(kMax);
+				tethra[2] = this->getCoordinate(static_cast<int>(kMax));
+				tethraIndex[2] = kMax;
 			// 4: farthest from facet of first, second and third
 				Coordinate N = cross(
 					Coordinate{tethra[1].x - tethra[0].x, tethra[1].y - tethra[0].y, tethra[1].z - tethra[0].z} ,
@@ -168,9 +169,12 @@ namespace qh {
 					}
 				}
 				tethra[3] = this->getCoordinate(temp.second);
-				this->invalidate(temp.second);
+				tethraIndex[3] = static_cast<std::size_t>(temp.second);
 
-				return tethra;
+				for (std::size_t k = 0; k < 4; ++k) {
+					this->invalidate(tethraIndex[k]);
+				}
+				return std::make_pair(tethra, tethraIndex);
 			}
 
 			static std::vector<const V*> tocCloud(const Cloud& cloud) {
@@ -182,8 +186,8 @@ namespace qh {
 				return cl;
 			}; 
 
-			std::pair<float, int> getFarthest(const Coordinate& A, const Coordinate& N) final{
-				std::pair<float, int> result = std::make_pair(0.f , -1);
+			std::pair<int, float> getFarthest(const Coordinate& A, const Coordinate& N) final{
+				std::pair<int, float> result = std::make_pair(-1, QHULL_GEOMETRIC_TOLLERANCE);
 				float dist;
 				Coordinate Delta;
 				for(std::size_t k=0; k<this->cloud.size(); ++k) {
