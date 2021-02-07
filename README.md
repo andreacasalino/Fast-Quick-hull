@@ -22,3 +22,5 @@ You can use the script pyhton ./Samples/Plotter.py to visualize each result in a
    * `git submodule update`
    
  * Configure and generate the project using [CMake](https://cmake.org)
+ 
+ ![Example of convex hulls](https://github.com/andreacasalino/XML-GUI/blob/master/Example.png)
