@@ -1,3 +1,0 @@
-[submodule "Lib/ThreadPool"]
-	path = Lib/ThreadPool
-	url = https://github.com/andreacasalino/Cpp-Thread-Pool
