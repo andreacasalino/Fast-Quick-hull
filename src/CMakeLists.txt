@@ -16,6 +16,7 @@ Hull
 )
 
 if(Fast-Quick-Hull-THREAD_POOL_OPT)
+  SET(BUILD_Thread_Pool_SAMPLES OFF CACHE BOOL "Override thread pool sample option" FORCE)
   message(STATUS "fetching Thread Pool")
   FetchContent_Declare(
     th_pool

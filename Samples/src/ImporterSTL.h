@@ -5,13 +5,11 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#ifndef SAMPLE_IMPORTER_STL_H
-#define SAMPLE_IMPORTER_STL_H
+#pragma once
 
 #include "Logger.h"
 
-/** @brief Import an .STL file (https://en.wikipedia.org/wiki/STL_(file_format) as a point cloud of vertices.
-*/
-std::list<Vector3d> importSTL(const std::string& stlFileName);
-
-#endif  
+/** @brief Import an .STL file (https://en.wikipedia.org/wiki/STL_(file_format)
+ * as a point cloud of vertices.
+ */
+std::list<Vector3d> importSTL(const std::string &stlFileName);

@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 option(LIB_OPT "Compile shared libraries (ON) or static (OFF)" OFF)
-option(BUILD_SAMPLES "Build the samples showing how to use the package" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -18,6 +17,7 @@ option(Fast-Quick-Hull-THREAD_POOL_OPT "thread pool enabled (ON) or disabled (OF
 project(Fast-Quick-Hull-Prj)
 add_subdirectory(src)
 
-# if(BUILD_SAMPLES)
-#    add_subdirectory(Samples)
-# endif()
+option(Fast-Quick-Hull-BUILD_SAMPLES "Build the samples showing how to use the package" ON)
+if(Fast-Quick-Hull-BUILD_SAMPLES)
+   add_subdirectory(Samples)
+endif()
