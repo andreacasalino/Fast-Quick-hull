@@ -5,19 +5,15 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#ifndef QHULL_ERROR_H
-#define QHULL_ERROR_H
+#pragma once
 
 #include <stdexcept>
 
 namespace qh {
-    /** @brief A runtime error that can be raised when using any object in qh::
-	 */
-    class Error : public std::runtime_error {
-    public:
-        explicit Error(const std::string& what) : std::runtime_error(what) {
-        };
-    };
-}
-
-#endif
+/** @brief A runtime error that can be raised when using any object in qh::
+ */
+class Error : public std::runtime_error {
+public:
+  explicit Error(const std::string &what) : std::runtime_error(what){};
+};
+} // namespace qh
