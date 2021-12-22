@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <Coordinate.h>
-#include <Error.h>
+#include <Hull/Coordinate.h>
+#include <QuickHull/Error.h>
 #include <array>
 #include <vector>
 #ifdef THREAD_POOL_ENABLED
@@ -83,11 +83,11 @@ public:
                   -> second: the outgoing normals of each facets.
    */
   template <typename V, typename Cloud>
-  std::pair<std::vector<FacetIncidences>, std::vector<Coordinate>>
+  std::pair<std::vector<FacetIncidences>, std::vector<hull::Coordinate>>
   convexHullWithNormals(const Cloud &cloud) {
     CloudHandlerConcrete<V, Cloud> hndl(cloud);
     std::vector<FacetIncidences> incidences;
-    std::vector<Coordinate> normals;
+    std::vector<hull::Coordinate> normals;
     this->_convexHull(incidences, &normals, hndl);
     return std::make_pair(std::move(incidences), std::move(normals));
   };
@@ -95,11 +95,12 @@ public:
 private:
   class CloudHandler {
   public:
-    virtual std::pair<std::array<Coordinate, 4>, std::array<std::size_t, 4>>
+    virtual std::pair<std::array<hull::Coordinate, 4>,
+                      std::array<std::size_t, 4>>
     getInitialTethraedron() = 0;
-    virtual std::pair<int, float> getFarthest(const Coordinate &A,
-                                              const Coordinate &N) = 0;
-    virtual Coordinate getCoordinate(const int &incidence) = 0;
+    virtual std::pair<int, float> getFarthest(const hull::Coordinate &A,
+                                              const hull::Coordinate &N) = 0;
+    virtual hull::Coordinate getCoordinate(const int &incidence) = 0;
     virtual void invalidate(const int &incidence) = 0;
   };
 
@@ -114,15 +115,16 @@ private:
     };
 
   private:
-    inline static float squaredDistance(const Coordinate &a, const V &b) {
+    inline static float squaredDistance(const hull::Coordinate &a, const V &b) {
       float res = (a.x - b.x()) * (a.x - b.x());
       res += (a.y - b.y()) * (a.y - b.y());
       res += (a.z - b.z()) * (a.z - b.z());
       return res;
     }
 
-    inline static float squaredDistanceLine(const Coordinate &a,
-                                            const Coordinate &b, const V &c) {
+    inline static float squaredDistanceLine(const hull::Coordinate &a,
+                                            const hull::Coordinate &b,
+                                            const V &c) {
       float V1[3];
       V1[0] = a.x - c.x();
       V1[1] = a.y - c.y();
@@ -141,15 +143,15 @@ private:
       return result;
     }
 
-    std::pair<std::array<Coordinate, 4>, std::array<std::size_t, 4>>
+    std::pair<std::array<hull::Coordinate, 4>, std::array<std::size_t, 4>>
     getInitialTethraedron() final {
-      std::array<Coordinate, 4> tethra;
+      std::array<hull::Coordinate, 4> tethra;
       std::array<std::size_t, 4> tethraIndex;
       // 1: farthest from origin
       std::size_t kMax = 0, k;
-      float distMax = squaredDistance(ORIGIN, *this->cloud[0]), dist;
+      float distMax = squaredDistance(hull::ORIGIN, *this->cloud[0]), dist;
       for (k = 1; k < this->cloud.size(); ++k) {
-        dist = squaredDistance(ORIGIN, *this->cloud[k]);
+        dist = squaredDistance(hull::ORIGIN, *this->cloud[k]);
         if (dist > distMax) {
           kMax = k;
           distMax = dist;
@@ -188,10 +190,10 @@ private:
       tethra[2] = this->getCoordinate(static_cast<int>(kMax));
       tethraIndex[2] = kMax;
       // 4: farthest from facet of first, second and third
-      Coordinate N =
-          cross(Coordinate{tethra[1].x - tethra[0].x, tethra[1].y - tethra[0].y,
+      hull::Coordinate N = cross(
+          hull::Coordinate{tethra[1].x - tethra[0].x, tethra[1].y - tethra[0].y,
                            tethra[1].z - tethra[0].z},
-                Coordinate{tethra[2].x - tethra[0].x, tethra[2].y - tethra[0].y,
+          hull::Coordinate{tethra[2].x - tethra[0].x, tethra[2].y - tethra[0].y,
                            tethra[2].z - tethra[0].z});
       auto temp = this->getFarthest(tethra[0], N);
       if (0.f == temp.first) {
@@ -219,12 +221,12 @@ private:
       return cl;
     };
 
-    std::pair<int, float> getFarthest(const Coordinate &A,
-                                      const Coordinate &N) final {
+    std::pair<int, float> getFarthest(const hull::Coordinate &A,
+                                      const hull::Coordinate &N) final {
       std::pair<int, float> result =
           std::make_pair(-1, QHULL_GEOMETRIC_TOLLERANCE);
       float dist;
-      Coordinate Delta;
+      hull::Coordinate Delta;
       for (std::size_t k = 0; k < this->cloud.size(); ++k) {
         if (this->pointValidity[k]) {
           Delta.x = this->cloud[k]->x() - A.x;
@@ -240,9 +242,9 @@ private:
       return result;
     };
 
-    Coordinate getCoordinate(const int &incidence) final {
+    hull::Coordinate getCoordinate(const int &incidence) final {
       const V *pV = this->cloud[incidence];
-      return Coordinate{pV->x(), pV->y(), pV->z()};
+      return hull::Coordinate{pV->x(), pV->y(), pV->z()};
     };
 
     inline void invalidate(const int &incidence) {
@@ -258,7 +260,7 @@ private:
   class DistanceMapperPool;
 #endif
   void _convexHull(std::vector<FacetIncidences> &indices,
-                   std::vector<Coordinate> *normals, CloudHandler &hndlr);
+                   std::vector<hull::Coordinate> *normals, CloudHandler &hndlr);
 
   // data
   std::size_t maxIterations = 1000;
