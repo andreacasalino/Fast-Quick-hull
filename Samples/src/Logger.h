@@ -26,7 +26,7 @@ private:
   float coordinates[3];
 };
 
-#include <FastQuickHull.h>
+#include <QuickHull/FastQuickHull.h>
 #include <list>
 #include <string>
 
