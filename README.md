@@ -15,11 +15,6 @@ You can use the script pyhton ./Samples/Plotter.py to visualize each result in a
  * `python Plotter.py $(name of the .json to plot)`
  
 **Compile**
-
- * (**ONLY FOR USING THE THREAD POOL STRATEGY, OTHERWISE SKIP**) After cloning the library you need to initialize a git submodule by running the following commands from the root folder:
-   
-   * `git submodule init`
-   * `git submodule update`
    
  * Configure and generate the project using [CMake](https://cmake.org)
  
