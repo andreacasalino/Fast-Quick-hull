@@ -26,7 +26,9 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
     points.invalidateVertex(index);
   }
 
-  while (!mapper.getDistancesFacetsMap().empty()) {
+  for (std::size_t iteration = 0; (iteration < cntx.max_iterations) &&
+                                  (!mapper.getDistancesFacetsMap().empty());
+       ++iteration) {
     const auto &[facet, vertex] =
         mapper.getDistancesFacetsMap().begin()->second;
     hull.update(points.accessVertex(vertex), facet);
@@ -57,5 +59,23 @@ get_normals(const std::vector<hull::Facet> &faces) {
   return result;
 }
 } // namespace
+
+std::vector<FacetIncidences>
+convex_hull(const std::vector<hull::Coordinate> &points,
+            const ConvexHullContext &cntx) {
+  PointCloud cloud(points);
+  auto hull = convex_hull_(cloud, cntx);
+  return get_indices(hull.getFacets());
+}
+
+std::vector<FacetIncidences>
+convex_hull(const std::vector<hull::Coordinate> &points,
+            const ConvexHullContext &cntx,
+            std::vector<hull::Coordinate> &convex_hull_normals) {
+  PointCloud cloud(points);
+  auto hull = convex_hull_(cloud, cntx);
+  convex_hull_normals = get_normals(hull.getFacets());
+  return get_indices(hull.getFacets());
+}
 
 } // namespace qh

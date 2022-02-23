@@ -7,9 +7,11 @@
 
 #pragma once
 
-#include <QuickHull/PointCloud.h>
+#include <Hull/Coordinate.h>
 
+#include <algorithm>
 #include <array>
+#include <vector>
 
 namespace qh {
 using FacetIncidences = std::array<std::size_t, 3>;
@@ -33,14 +35,23 @@ struct ConvexHullContext {
  element is a triplet with the positions of the vertices in the cloud
  composing that facet
  */
-std::vector<FacetIncidences> convex_hull(const PointCloud &points,
-                                         const ConvexHullContext &cntx);
+std::vector<FacetIncidences>
+convex_hull(const std::vector<hull::Coordinate> &points,
+            const ConvexHullContext &cntx);
 
 template <typename VerticesIterator, typename CoordinateConverter>
 std::vector<FacetIncidences> convex_hull(const VerticesIterator &vertices_begin,
                                          const VerticesIterator &vertices_end,
                                          const CoordinateConverter &converter,
-                                         const ConvexHullContext &cntx);
+                                         const ConvexHullContext &cntx) {
+  std::vector<hull::Coordinate> points;
+  points.reserve(std::distance(vertices_begin, vertices_end));
+  std::for_each(vertices_begin, vertices_end,
+                [&points, &converter](const auto &element) {
+                  points.push_back(converter(element));
+                });
+  return convex_hull(points, cntx);
+};
 
 /** @brief The convex hull is built starting from a point cloud described by
  Cloud.
@@ -59,7 +70,8 @@ std::vector<FacetIncidences> convex_hull(const VerticesIterator &vertices_begin,
                 -> second: the outgoing normals of each facets.
  */
 std::vector<FacetIncidences>
-convex_hull(const PointCloud &points, const ConvexHullContext &cntx,
+convex_hull(const std::vector<hull::Coordinate> &points,
+            const ConvexHullContext &cntx,
             std::vector<hull::Coordinate> &convex_hull_normals);
 
 template <typename VerticesIterator, typename CoordinateConverter>
@@ -67,6 +79,14 @@ std::vector<FacetIncidences>
 convex_hull(const VerticesIterator &vertices_begin,
             const VerticesIterator &vertices_end,
             const CoordinateConverter &converter, const ConvexHullContext &cntx,
-            std::vector<hull::Coordinate> &convex_hull_normals);
+            std::vector<hull::Coordinate> &convex_hull_normals) {
+  std::vector<hull::Coordinate> points;
+  points.reserve(std::distance(vertices_begin, vertices_end));
+  std::for_each(vertices_begin, vertices_end,
+                [&points, &converter](const auto &element) {
+                  points.push_back(converter(element));
+                });
+  return convex_hull(points, cntx, convex_hull_normals);
+};
 
 } // namespace qh

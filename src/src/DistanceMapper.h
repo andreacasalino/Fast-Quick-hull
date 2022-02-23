@@ -9,7 +9,8 @@
 
 #include <Hull/Hull.h>
 #include <QuickHull/FastQuickHull.h>
-#include <QuickHull/PointCloud.h>
+
+#include "PointCloud.h"
 
 #include <map>
 #include <memory>
