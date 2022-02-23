@@ -47,4 +47,5 @@ PointCloud::getFarthest(const hull::Coordinate &point_on_facet,
   }
   return result;
 }
+
 } // namespace qh

@@ -21,7 +21,6 @@ public:
   DistanceMapper(const PointCloud &cloud) : cloud(cloud){};
 
   void update();
-  // void update(const std::size_t calling_thread_id);
 
   struct FacetAndFarthestVertex {
     std::size_t facet_index;

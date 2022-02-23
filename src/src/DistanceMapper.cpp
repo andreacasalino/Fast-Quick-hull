@@ -6,6 +6,7 @@
  **/
 
 #include "DistanceMapper.h"
+#include <omp.h>
 
 namespace qh {
 
@@ -50,43 +51,20 @@ void DistanceMapper::update() {
   throw 0; // use reverse order for the distances map
 
   // added facets
-  for (const auto &added : last_notification->added) {
+#pragma omp for
+  for (const auto added : last_notification->added) {
     updateAddedFacet(added);
   }
-  // changed facets
-  for (const auto &changed : last_notification->added) {
+// changed facets
+#pragma omp for
+  for (const auto changed : last_notification->added) {
     updateChangedFacet(changed);
   }
-  // removed facets
+// removed facets
+#pragma omp for
   for (const auto &removed : last_notification->removed) {
     updateRemovedFacet(removed.old_index);
   }
+#pragma omp barrier
 }
-
-// void QuickHullSolver::DistanceMapper::AddedChangedFacets(const
-// std::list<const hull::Facet*>& added,const std::list<const hull::Facet*>&
-// changed) const {
-//     for(auto it = changed.begin(); it!=changed.end(); ++it) {
-//         auto farthest = this->hndlr.getFarthest(*(*it)->A, (*it)->N);
-//         if(farthest.second > QHULL_GEOMETRIC_TOLLERANCE) {
-//             this->distanceMap.find(*it)->second = farthest;
-//         }
-//         else {
-//             this->distanceMap.erase(this->distanceMap.find(*it));
-//         }
-//     }
-//     for(auto it = added.begin(); it!=added.end(); ++it) {
-//         auto farthest = this->hndlr.getFarthest(*(*it)->A, (*it)->N);
-//         if(farthest.second > QHULL_GEOMETRIC_TOLLERANCE) {
-//             this->distanceMap.emplace(*it, farthest);
-//         }
-//     }
-// };
-
-// void QuickHullSolver::DistanceMapper::RemovedFacets(const std::list<const
-// hull::Facet*>& removed) const {
-//     for(auto it = removed.begin(); it!=removed.end(); ++it) {
-//         this->distanceMap.erase(this->distanceMap.find(*it));
-//     }
-// };
 } // namespace qh

@@ -10,8 +10,35 @@
 
 #include "DistanceMapper.h"
 
+#include <omp.h>
+
 namespace qh {
 namespace {
+int get_default_pool_size() {
+  int result = 0;
+#pragma omp parallel
+  {
+    if (0 == omp_get_thread_num()) {
+      result = omp_get_num_threads();
+    }
+  }
+  return result;
+}
+
+static const int DEAFULT_POOL_SIZE = get_default_pool_size();
+
+int get_pool_size(const std::optional<std::size_t> &thread_pool_size) {
+  int pool_size = 1;
+  if (thread_pool_size != std::nullopt) {
+    if (*thread_pool_size <= 1) {
+      pool_size = DEAFULT_POOL_SIZE;
+    } else {
+      pool_size = *thread_pool_size;
+    }
+  }
+  return pool_size;
+}
+
 hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
   DistanceMapper mapper(points);
 
@@ -21,19 +48,37 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
                   points.accessVertex(initial_tethraedron[2]),
                   points.accessVertex(initial_tethraedron[3]));
   hull.setObserver(mapper);
-  mapper.update();
-  for (const auto index : initial_tethraedron) {
-    points.invalidateVertex(index);
-  }
 
-  for (std::size_t iteration = 0; (iteration < cntx.max_iterations) &&
-                                  (!mapper.getDistancesFacetsMap().empty());
-       ++iteration) {
-    const auto &[facet, vertex] =
-        mapper.getDistancesFacetsMap().begin()->second;
-    hull.update(points.accessVertex(vertex), facet);
-    mapper.update();
-    points.invalidateVertex(vertex);
+  bool life = true;
+  auto pool_size = get_pool_size(cntx.thread_pool_size);
+#pragma omp parallel num_threads pool_size
+  {
+    auto th_id = omp_get_thread_num();
+    if (0 == th_id) {
+#pragma omp barrier
+      mapper.update();
+      for (const auto index : initial_tethraedron) {
+        points.invalidateVertex(index);
+      }
+
+      for (std::size_t iteration = 0; (iteration < cntx.max_iterations) &&
+                                      (!mapper.getDistancesFacetsMap().empty());
+           ++iteration) {
+        const auto &[facet, vertex] =
+            mapper.getDistancesFacetsMap().begin()->second;
+        hull.update(points.accessVertex(vertex), facet);
+#pragma omp barrier
+        mapper.update();
+        points.invalidateVertex(vertex);
+      }
+      life = false;
+    } else {
+#pragma omp barrier
+      if (!life) {
+        return;
+      }
+      mapper.update();
+    }
   }
 
   return hull;

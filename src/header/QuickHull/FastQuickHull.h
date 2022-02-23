@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <vector>
 
 namespace qh {
@@ -18,7 +19,7 @@ using FacetIncidences = std::array<std::size_t, 3>;
 
 struct ConvexHullContext {
   std::size_t max_iterations = 1000;
-  std::size_t thread_pool_size = 0;
+  std::optional<std::size_t> thread_pool_size = std::nullopt;
 };
 
 /** @brief The convex hull is built starting from a point cloud described by
