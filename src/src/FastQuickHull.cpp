@@ -10,6 +10,8 @@
 #include <memory>
 
 namespace qh {
+constexpr float QHULL_GEOMETRIC_TOLLERANCE = static_cast<float>(1e-3);
+
 QuickHullSolver::QuickHullSolver(
 #ifdef THREAD_POOL_ENABLED
     const std::size_t &poolSize

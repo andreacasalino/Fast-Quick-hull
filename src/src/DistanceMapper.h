@@ -7,29 +7,42 @@
 
 #pragma once
 
+#include "PointCloud.h"
 #include <Hull/Hull.h>
 #include <QuickHull/FastQuickHull.h>
+
 #include <map>
+#include <memory>
 
 namespace qh {
-class QuickHullSolver::DistanceMapper : public hull::Observer {
+class DistanceMapper : public hull::Observer {
 public:
-  DistanceMapper(CloudHandler &hndlr) : hndlr(hndlr){};
+  DistanceMapper(PointCloud &cloud) : cloud(cloud){};
 
-  void AddedChangedFacets(
-      const std::list<const hull::Facet *> &added,
-      const std::list<const hull::Facet *> &changed) const override;
+  void update();
+  // void update(const std::size_t calling_thread_id);
 
-  void
-  RemovedFacets(const std::list<const hull::Facet *> &removed) const override;
-
-  inline std::map<const hull::Facet *, std::pair<int, float>> &
-  getDistanceMap() const {
-    return this->distanceMap;
+  struct FarthestVertexAndDistance {
+    std::size_t vertex_index;
+    float distance;
   };
+  const std::map<const hull::Facet *, FarthestVertexAndDistance> &
+  getFacetsDistancesMap() const;
+
+  struct FacetAndFarthestVertex {
+    std::size_t vertex_index;
+    std::size_t facet_index;
+  };
+  const std::multimap<float, FacetAndFarthestVertex> &
+  getDistancesFacetsMap() const;
 
 protected:
-  CloudHandler &hndlr;
-  mutable std::map<const hull::Facet *, std::pair<int, float>> distanceMap;
+  PointCloud &cloud;
+
+  std::unique_ptr<Notification> last_notification;
+  void hullChanges(const Notification &notification) override;
+
+  std::map<const hull::Facet *, FarthestVertexAndDistance> facets_distances_map;
+  std::multimap<float, FacetAndFarthestVertex> distances_facets_map;
 };
 } // namespace qh

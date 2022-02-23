@@ -1,32 +1,38 @@
 #pragma once
 
-#include <Coordinate.h>
-#include <array>
+#include <Hull/Coordinate.h>
 #include <memory>
+#include <vector>
 
 namespace qh {
-using VertexIndex = std::size_t;
-
-struct VertexIndexAndCoordinate {
-  VertexIndex index;
-  hull::Coordinate coordinates;
+struct VertexAndCoordinate {
+  std::size_t vertex_index;
+  hull::Coordinate coordinate;
 };
 
 class PointCloud {
 public:
-  virtual ~PointCloud() = default;
+  PointCloud(const std::vector<hull::Coordinate> &points);
 
-  virtual std::array<VertexIndexAndCoordinate, 4> getInitialTethraedron() = 0;
+  std::vector<VertexAndCoordinate> getInitialTethraedron() const;
 
-  struct FarthestResult {
-    VertexIndexAndCoordinate vertex_and_coordinate;
+  struct FarthestVertex {
+    VertexAndCoordinate vertex_and_coordinate;
     float distance;
   };
-  virtual std::unique_ptr<FarthestResult>
+  std::unique_ptr<FarthestVertex>
   getFarthest(const hull::Coordinate &point_on_facet,
-              const hull::Coordinate &facet_normal) const = 0;
+              const hull::Coordinate &facet_normal) const;
 
-  virtual hull::Coordinate accessVertex(const VertexIndex incidence) const = 0;
-  virtual void invalidateVertex(const VertexIndex incidence) = 0;
+  const hull::Coordinate &accessVertex(const std::size_t index) const {
+    return points[index];
+  }
+  void invalidateVertex(const std::size_t index) {
+    points_still_free[index] = false;
+  };
+
+private:
+  const std::vector<hull::Coordinate> points;
+  std::vector<bool> points_still_free;
 };
 } // namespace qh
