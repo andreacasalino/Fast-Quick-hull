@@ -5,19 +5,14 @@
 #include <vector>
 
 namespace qh {
-struct VertexAndCoordinate {
-  std::size_t vertex_index;
-  hull::Coordinate coordinate;
-};
-
 class PointCloud {
 public:
   PointCloud(const std::vector<hull::Coordinate> &points);
 
-  std::vector<VertexAndCoordinate> getInitialTethraedron() const;
+  std::vector<std::size_t> getInitialTethraedron() const;
 
   struct FarthestVertex {
-    VertexAndCoordinate vertex_and_coordinate;
+    std::size_t vertex;
     float distance;
   };
   std::unique_ptr<FarthestVertex>

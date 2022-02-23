@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
   hull
   GIT_REPOSITORY https://github.com/andreacasalino/Hull.git
-  GIT_TAG        2d0732562c10294f9327b67e8c39d376c9d50f9a
+  GIT_TAG        c0517c4b9a568fd138d551e58ad09ed5d9ad5b9c
 )
 FetchContent_MakeAvailable(hull)
 
