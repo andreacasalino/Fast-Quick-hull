@@ -16,7 +16,7 @@ void DistanceMapper::updateAddedFacet(const std::size_t facet_index) {
   auto result = cloud.getFarthest(facet_vertex, facet.normal);
   if (nullptr != result) {
     facets_distances_map[facet_index] = result->distance;
-    facets_distances_map.emplace(
+    distances_facets_map.emplace(
         result->distance, FacetAndFarthestVertex{facet_index, result->vertex});
   }
 }
@@ -28,7 +28,7 @@ void DistanceMapper::updateChangedFacet(const std::size_t facet_index) {
   updateRemovedFacet(facet_index);
   if (nullptr != result) {
     facets_distances_map[facet_index] = result->distance;
-    facets_distances_map.emplace(
+    distances_facets_map.emplace(
         result->distance, FacetAndFarthestVertex{facet_index, result->vertex});
   }
 }

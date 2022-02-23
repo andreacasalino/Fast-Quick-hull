@@ -51,7 +51,7 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
 
   bool life = true;
   auto pool_size = get_pool_size(cntx.thread_pool_size);
-#pragma omp parallel num_threads pool_size
+#pragma omp parallel num_threads(pool_size)
   {
     auto th_id = omp_get_thread_num();
     if (0 == th_id) {
@@ -72,12 +72,15 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
         points.invalidateVertex(vertex);
       }
       life = false;
-    } else {
 #pragma omp barrier
-      if (!life) {
-        return;
+    } else {
+      while (true) {
+#pragma omp barrier
+        if (!life) {
+          break;
+        }
+        mapper.update();
       }
-      mapper.update();
     }
   }
 
