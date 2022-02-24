@@ -8,6 +8,10 @@
 #include "Logger.h"
 #include <fstream>
 
+hull::Coordinate to_hull_coordinate(const Vector3d &to_convert) {
+  return hull::Coordinate{to_convert.x(), to_convert.y(), to_convert.z()};
+}
+
 float get(const std::size_t &pos, const Vector3d &v) {
   switch (pos) {
   case 0:
