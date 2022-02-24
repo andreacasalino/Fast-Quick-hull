@@ -14,6 +14,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 
 namespace qh {
 struct FacetAndFarthestVertex {
@@ -45,6 +46,7 @@ protected:
   void updateChangedFacet(const hull::Facet *facet);
   void updateRemovedFacet(const hull::Facet *facet);
 
+  std::mutex maps_mtx;
   DistancesFacetsMap distances_facets_map;
   std::map<const hull::Facet *, float> facets_distances_map;
 };

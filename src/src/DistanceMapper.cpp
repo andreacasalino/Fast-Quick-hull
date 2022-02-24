@@ -14,6 +14,7 @@ void DistanceMapper::updateAddedFacet(const hull::Facet *facet) {
   auto result = cloud.getFarthest(
       last_notification->context.vertices[facet->vertexA], facet->normal);
   if (nullptr != result) {
+    std::scoped_lock map_lock(maps_mtx);
     facets_distances_map[facet] = result->distance;
     distances_facets_map.emplace(result->distance,
                                  FacetAndFarthestVertex{facet, result->vertex});
@@ -25,6 +26,7 @@ void DistanceMapper::updateChangedFacet(const hull::Facet *facet) {
       last_notification->context.vertices[facet->vertexA], facet->normal);
   updateRemovedFacet(facet);
   if (nullptr != result) {
+    std::scoped_lock map_lock(maps_mtx);
     facets_distances_map[facet] = result->distance;
     distances_facets_map.emplace(result->distance,
                                  FacetAndFarthestVertex{facet, result->vertex});
@@ -32,6 +34,7 @@ void DistanceMapper::updateChangedFacet(const hull::Facet *facet) {
 }
 
 void DistanceMapper::updateRemovedFacet(const hull::Facet *facet) {
+  std::scoped_lock map_lock(maps_mtx);
   auto facets_distances_map_it = facets_distances_map.find(facet);
   auto range =
       distances_facets_map.equal_range(facets_distances_map_it->second);
@@ -46,15 +49,15 @@ void DistanceMapper::updateRemovedFacet(const hull::Facet *facet) {
 }
 
 void DistanceMapper::update() {
-  // added facets
-#pragma omp for
-  for (const auto added : last_notification->added) {
-    updateAddedFacet(added);
-  }
 // changed facets
 #pragma omp for
-  for (const auto changed : last_notification->added) {
+  for (const auto *changed : last_notification->changed) {
     updateChangedFacet(changed);
+  }
+  // added facets
+#pragma omp for
+  for (const auto *added : last_notification->added) {
+    updateAddedFacet(added);
   }
 // removed facets
 #pragma omp for
