@@ -1,5 +1,5 @@
 This library contains the implementations of the **Quick Hull** algorithm, which is able to efficiently computes the **convex hull** of point clouds.
-If you are interested in the theoretical aspects behind the algorithm have a look at ./doc/Fast_QHull.pdf.
+If you are interested in the theoretical aspects behind the algorithm have a look at the [documentation](./doc/Fast_QHull.pdf).
 
 This library is stand-alone and completely **cross platform**. Use [CMake](https://cmake.org) to configure the project.
 
