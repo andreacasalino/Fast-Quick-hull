@@ -33,9 +33,8 @@ TEST_CASE("Random clouds") {
                     qh::ConvexHullContext{2000, std::nullopt});
   }
 
-  // SECTION("Multi Threaded") {
-  //   qh::convex_hull(std::vector<hull::Coordinate>{cloud.begin(),
-  //   cloud_it_end},
-  //                   qh::ConvexHullContext{2000, 2});
-  // }
+  SECTION("Multi Threaded") {
+    qh::convex_hull(std::vector<hull::Coordinate>{cloud.begin(), cloud_it_end},
+                    qh::ConvexHullContext{2000, 2});
+  }
 }
