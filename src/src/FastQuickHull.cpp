@@ -10,6 +10,7 @@
 
 #include "DistanceMapper.h"
 
+#include <algorithm>
 #include <omp.h>
 
 namespace qh {
@@ -46,8 +47,7 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
   hull::Hull hull(points.accessVertex(initial_tethraedron[0]),
                   points.accessVertex(initial_tethraedron[1]),
                   points.accessVertex(initial_tethraedron[2]),
-                  points.accessVertex(initial_tethraedron[3]));
-  hull.setObserver(mapper);
+                  points.accessVertex(initial_tethraedron[3]), mapper);
 
   bool life = true;
   auto pool_size = get_pool_size(cntx.thread_pool_size);
@@ -66,7 +66,13 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
            ++iteration) {
         const auto &[facet, vertex] =
             mapper.getDistancesFacetsMap().begin()->second;
-        hull.update(points.accessVertex(vertex), facet);
+        auto facets_it =
+            std::find_if(hull.getFacets().begin(), hull.getFacets().end(),
+                         [&facet = facet](const hull::FacetPtr &element) {
+                           return facet == element.get();
+                         });
+        hull.update(points.accessVertex(vertex),
+                    std::distance(hull.getFacets().begin(), facets_it));
 #pragma omp barrier
         mapper.update();
         points.invalidateVertex(vertex);
@@ -87,22 +93,21 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
   return hull;
 }
 
-std::vector<FacetIncidences>
-get_indices(const std::vector<hull::Facet> &faces) {
+std::vector<FacetIncidences> get_indices(const hull::Facets &faces) {
   std::vector<FacetIncidences> result;
   result.reserve(faces.size());
   for (const auto &face : faces) {
-    result.push_back(FacetIncidences{face.vertexA, face.vertexB, face.vertexC});
+    result.push_back(
+        FacetIncidences{face->vertexA, face->vertexB, face->vertexC});
   }
   return result;
 }
 
-std::vector<hull::Coordinate>
-get_normals(const std::vector<hull::Facet> &faces) {
+std::vector<hull::Coordinate> get_normals(const hull::Facets &faces) {
   std::vector<hull::Coordinate> result;
   result.reserve(faces.size());
   for (const auto &face : faces) {
-    result.push_back(face.normal);
+    result.push_back(face->normal);
   }
   return result;
 }

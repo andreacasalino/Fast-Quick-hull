@@ -16,18 +16,20 @@
 #include <memory>
 
 namespace qh {
+struct FacetAndFarthestVertex {
+  const hull::Facet *facet;
+  std::size_t vertex_index;
+};
+using DistancesFacetsMap =
+    std::multimap<float, FacetAndFarthestVertex, std::greater<float>>;
+
 class DistanceMapper : public hull::Observer {
 public:
   DistanceMapper(const PointCloud &cloud) : cloud(cloud){};
 
   void update();
 
-  struct FacetAndFarthestVertex {
-    std::size_t facet_index;
-    std::size_t vertex_index;
-  };
-  const std::multimap<float, FacetAndFarthestVertex> &
-  getDistancesFacetsMap() const {
+  const DistancesFacetsMap &getDistancesFacetsMap() const {
     return distances_facets_map;
   };
 
@@ -35,15 +37,15 @@ protected:
   const PointCloud &cloud;
 
   std::unique_ptr<Notification> last_notification;
-  void hullChanges(const Notification &notification) override {
-    last_notification = std::make_unique<Notification>(notification);
+  void hullChanges(Notification &&notification) override {
+    last_notification = std::make_unique<Notification>(std::move(notification));
   };
 
-  void updateAddedFacet(const std::size_t facet_index);
-  void updateChangedFacet(const std::size_t facet_index);
-  void updateRemovedFacet(const std::size_t facet_index);
+  void updateAddedFacet(const hull::Facet *facet);
+  void updateChangedFacet(const hull::Facet *facet);
+  void updateRemovedFacet(const hull::Facet *facet);
 
-  std::multimap<float, FacetAndFarthestVertex> distances_facets_map;
-  std::map<std::size_t, float> facets_distances_map;
+  DistancesFacetsMap distances_facets_map;
+  std::map<const hull::Facet *, float> facets_distances_map;
 };
 } // namespace qh
