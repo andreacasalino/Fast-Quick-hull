@@ -1,13 +1,9 @@
 #include "PointCloud.h"
 #include <QuickHull/Error.h>
 
-namespace qh {
-namespace {
-constexpr float QHULL_GEOMETRIC_TOLLERANCE = static_cast<float>(1e-3);
-constexpr float QHULL_GEOMETRIC_TOLLERANCE_SQUARED =
-    QHULL_GEOMETRIC_TOLLERANCE * QHULL_GEOMETRIC_TOLLERANCE;
-} // namespace
+#include "Definitions.h"
 
+namespace qh {
 PointCloud::PointCloud(const std::vector<hull::Coordinate> &points)
     : points(points) {
   if (points.size() < 4) {
@@ -26,11 +22,10 @@ float get_vertex_distance(const hull::Coordinate &facet_point,
 }
 } // namespace
 
-std::unique_ptr<PointCloud::FarthestVertex>
+PointCloud::FarthestVertex
 PointCloud::getFarthest(const hull::Coordinate &point_on_facet,
                         const hull::Coordinate &facet_normal) const {
-  PointCloud::FarthestVertex result =
-      PointCloud::FarthestVertex{0, QHULL_GEOMETRIC_TOLLERANCE};
+  PointCloud::FarthestVertex result = PointCloud::FarthestVertex{0, 0.f};
   float distance;
   for (std::size_t pos = 0; pos < points.size(); ++pos) {
     if (points_still_free[pos]) {
@@ -41,10 +36,7 @@ PointCloud::getFarthest(const hull::Coordinate &point_on_facet,
       }
     }
   }
-  if (result.distance <= QHULL_GEOMETRIC_TOLLERANCE) {
-    return nullptr;
-  }
-  return std::make_unique<PointCloud::FarthestVertex>(result);
+  return result;
 }
 
 namespace {

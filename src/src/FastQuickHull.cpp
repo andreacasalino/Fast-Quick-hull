@@ -8,6 +8,7 @@
 #include <Hull/Hull.h>
 #include <QuickHull/FastQuickHull.h>
 
+#include "Definitions.h"
 #include "DistanceMapper.h"
 
 #include <algorithm>
@@ -57,12 +58,15 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
     if (0 == th_id) {
 #pragma omp barrier
       mapper.update();
+#pragma omp barrier
       for (const auto index : initial_tethraedron) {
         points.invalidateVertex(index);
       }
 
-      for (std::size_t iteration = 0; (iteration < cntx.max_iterations) &&
-                                      (!mapper.getDistancesFacetsMap().empty());
+      for (std::size_t iteration = 0;
+           (iteration < cntx.max_iterations) &&
+           (mapper.getDistancesFacetsMap().begin()->first >
+            QHULL_GEOMETRIC_TOLLERANCE);
            ++iteration) {
         const auto &[facet, vertex] =
             mapper.getDistancesFacetsMap().begin()->second;
@@ -75,6 +79,7 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
                     std::distance(hull.getFacets().begin(), facets_it));
 #pragma omp barrier
         mapper.update();
+#pragma omp barrier
         points.invalidateVertex(vertex);
       }
       life = false;
@@ -86,7 +91,8 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
           break;
         }
         mapper.update();
-      }
+#pragma omp barrier
+      };
     }
   }
 

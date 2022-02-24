@@ -13,24 +13,20 @@ namespace qh {
 void DistanceMapper::updateAddedFacet(const hull::Facet *facet) {
   auto result = cloud.getFarthest(
       last_notification->context.vertices[facet->vertexA], facet->normal);
-  if (nullptr != result) {
-    std::scoped_lock map_lock(maps_mtx);
-    facets_distances_map[facet] = result->distance;
-    distances_facets_map.emplace(result->distance,
-                                 FacetAndFarthestVertex{facet, result->vertex});
-  }
+  std::scoped_lock map_lock(maps_mtx);
+  facets_distances_map[facet] = result.distance;
+  distances_facets_map.emplace(result.distance,
+                               FacetAndFarthestVertex{facet, result.vertex});
 }
 
 void DistanceMapper::updateChangedFacet(const hull::Facet *facet) {
   auto result = cloud.getFarthest(
       last_notification->context.vertices[facet->vertexA], facet->normal);
   updateRemovedFacet(facet);
-  if (nullptr != result) {
-    std::scoped_lock map_lock(maps_mtx);
-    facets_distances_map[facet] = result->distance;
-    distances_facets_map.emplace(result->distance,
-                                 FacetAndFarthestVertex{facet, result->vertex});
-  }
+  std::scoped_lock map_lock(maps_mtx);
+  facets_distances_map[facet] = result.distance;
+  distances_facets_map.emplace(result.distance,
+                               FacetAndFarthestVertex{facet, result.vertex});
 }
 
 void DistanceMapper::updateRemovedFacet(const hull::Facet *facet) {
@@ -64,6 +60,5 @@ void DistanceMapper::update() {
   for (const auto &removed : last_notification->removed) {
     updateRemovedFacet(removed.get());
   }
-#pragma omp barrier
 }
 } // namespace qh
