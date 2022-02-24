@@ -34,5 +34,6 @@ private:
 hull::Coordinate to_hull_coordinate(const Vector3d &to_convert);
 
 void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
+                   const std::vector<hull::Coordinate> &convex_hull_normals,
                    const std::vector<Vector3d> &cloud,
                    const std::string &fileName);

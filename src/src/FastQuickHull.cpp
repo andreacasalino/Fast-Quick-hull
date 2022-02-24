@@ -129,8 +129,8 @@ convex_hull(const std::vector<hull::Coordinate> &points,
 
 std::vector<FacetIncidences>
 convex_hull(const std::vector<hull::Coordinate> &points,
-            const ConvexHullContext &cntx,
-            std::vector<hull::Coordinate> &convex_hull_normals) {
+            std::vector<hull::Coordinate> &convex_hull_normals,
+            const ConvexHullContext &cntx) {
   PointCloud cloud(points);
   auto hull = convex_hull_(cloud, cntx);
   convex_hull_normals = get_normals(hull.getFacets());

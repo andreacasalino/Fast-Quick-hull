@@ -15,12 +15,15 @@ int main() {
   auto cloud = sampleCloud(50);
 
   // compute the convex hull of the cloud
-  auto convex_hull_facets_incidences = qh::convex_hull(
-      cloud.begin(), cloud.end(), to_hull_coordinate, qh::ConvexHullContext{});
+  std::vector<hull::Coordinate> convex_hull_normals;
+  auto convex_hull_facets_incidences =
+      qh::convex_hull(cloud.begin(), cloud.end(), to_hull_coordinate,
+                      qh::ConvexHullContext{}, convex_hull_normals);
 
   // Log the result into a textual file, which can be visualized
   // running the python script Plotter.py
-  logConvexhull(convex_hull_facets_incidences, cloud, "Sample01.json");
+  logConvexhull(convex_hull_facets_incidences, convex_hull_normals, cloud,
+                "Sample01.json");
 
   std::cout << "call 'python Plotter.py Sample01.json' to see results"
             << std::endl;

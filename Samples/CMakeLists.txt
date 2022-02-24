@@ -26,3 +26,5 @@ if(BUILD_EXAMPLE_02)
     )
 endif()
 
+add_executable(ReadMe ReadMe.cpp)
+target_link_libraries(ReadMe PUBLIC Fast-Quick-Hull)	

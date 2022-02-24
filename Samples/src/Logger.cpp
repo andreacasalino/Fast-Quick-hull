@@ -6,61 +6,38 @@
  **/
 
 #include "Logger.h"
+#include <algorithm>
 #include <fstream>
 
 hull::Coordinate to_hull_coordinate(const Vector3d &to_convert) {
   return hull::Coordinate{to_convert.x(), to_convert.y(), to_convert.z()};
 }
 
-float get(const std::size_t &pos, const Vector3d &v) {
-  switch (pos) {
-  case 0:
-    return v.x();
-  case 1:
-    return v.y();
-  default:
-    return v.z();
+template <typename T, typename ValueExtractor>
+void append_vector(std::ofstream &stream, const std::vector<T> &collection,
+                   const ValueExtractor &extractor) {
+  auto append_element = [&stream, &extractor](const T &element) {
+    stream << '[' << std::to_string(extractor(element, 0)) << ','
+           << std::to_string(extractor(element, 1)) << ','
+           << std::to_string(extractor(element, 2)) << ']' << std::endl;
+  };
+
+  stream << '[' << std::endl;
+  if (!collection.empty()) {
+    auto collection_it = collection.begin();
+    append_element(*collection_it);
+    ++collection_it;
+    std::for_each(collection_it, collection.end(),
+                  [&append_element, &stream](const T &element) {
+                    stream << ',';
+                    append_element(element);
+                  });
   }
-  return v.z();
-}
-
-std::size_t get(const std::size_t &pos, const std::array<std::size_t, 3> &i) {
-  return i[pos];
-}
-
-float get(const std::size_t &pos, const hull::Coordinate &v) {
-  switch (pos) {
-  case 0:
-    return v.x;
-  case 1:
-    return v.y;
-  default:
-    return v.z;
-  }
-  return v.z;
-}
-
-template <typename T> void log(const T &e, std::ofstream &f) {
-  f << '[' << get(0, e) << ',' << get(1, e) << ',' << get(2, e) << ']'
-    << std::endl;
-}
-
-template <typename C>
-void log(const C &c, const std::string &name, std::ofstream &f) {
-  f << '\"' << name << "\":[" << std::endl;
-  if (!c.empty()) {
-    auto it = c.begin();
-    log(*it, f);
-    ++it;
-    for (it; it != c.end(); ++it) {
-      f << ',';
-      log(*it, f);
-    }
-  }
-  f << ']' << std::endl;
+  stream << ']' << std::endl;
 }
 
 void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
+                   const std::vector<hull::Coordinate> &convex_hull_normals,
                    const std::vector<Vector3d> &cloud,
                    const std::string &fileName) {
   std::ofstream f(fileName);
@@ -68,10 +45,34 @@ void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
     return;
 
   f << '{' << std::endl;
-  log(cloud, "Cloud", f);
-  f << ',';
-  log(ch.first, "Index", f);
-  f << ',';
-  log(ch.second, "Normals", f);
+  f << "\"Cloud\":";
+  append_vector(f, cloud, [](const Vector3d &element, const std::size_t index) {
+    switch (index) {
+    case 0:
+      return element.x();
+    case 1:
+      return element.y();
+    default:
+      break;
+    }
+    return element.z();
+  });
+  f << ",\"Index\":";
+  append_vector(f, facets_incidences,
+                [](const qh::FacetIncidences &element,
+                   const std::size_t index) { return element[index]; });
+  f << ",\"Normals\":";
+  append_vector(f, convex_hull_normals,
+                [](const hull::Coordinate &element, const std::size_t index) {
+                  switch (index) {
+                  case 0:
+                    return element.x;
+                  case 1:
+                    return element.y;
+                  default:
+                    break;
+                  }
+                  return element.z;
+                });
   f << '}';
 }

@@ -38,13 +38,14 @@ struct ConvexHullContext {
  */
 std::vector<FacetIncidences>
 convex_hull(const std::vector<hull::Coordinate> &points,
-            const ConvexHullContext &cntx);
+            const ConvexHullContext &cntx = ConvexHullContext{});
 
 template <typename VerticesIterator, typename CoordinateConverter>
-std::vector<FacetIncidences> convex_hull(const VerticesIterator &vertices_begin,
-                                         const VerticesIterator &vertices_end,
-                                         const CoordinateConverter &converter,
-                                         const ConvexHullContext &cntx) {
+std::vector<FacetIncidences>
+convex_hull(const VerticesIterator &vertices_begin,
+            const VerticesIterator &vertices_end,
+            const CoordinateConverter &converter,
+            const ConvexHullContext &cntx = ConvexHullContext{}) {
   std::vector<hull::Coordinate> points;
   points.reserve(std::distance(vertices_begin, vertices_end));
   std::for_each(vertices_begin, vertices_end,
@@ -72,22 +73,23 @@ std::vector<FacetIncidences> convex_hull(const VerticesIterator &vertices_begin,
  */
 std::vector<FacetIncidences>
 convex_hull(const std::vector<hull::Coordinate> &points,
-            const ConvexHullContext &cntx,
-            std::vector<hull::Coordinate> &convex_hull_normals);
+            std::vector<hull::Coordinate> &convex_hull_normals,
+            const ConvexHullContext &cntx = ConvexHullContext{});
 
 template <typename VerticesIterator, typename CoordinateConverter>
 std::vector<FacetIncidences>
 convex_hull(const VerticesIterator &vertices_begin,
             const VerticesIterator &vertices_end,
-            const CoordinateConverter &converter, const ConvexHullContext &cntx,
-            std::vector<hull::Coordinate> &convex_hull_normals) {
+            const CoordinateConverter &converter,
+            std::vector<hull::Coordinate> &convex_hull_normals,
+            const ConvexHullContext &cntx = ConvexHullContext{}) {
   std::vector<hull::Coordinate> points;
   points.reserve(std::distance(vertices_begin, vertices_end));
   std::for_each(vertices_begin, vertices_end,
                 [&points, &converter](const auto &element) {
                   points.push_back(converter(element));
                 });
-  return convex_hull(points, cntx, convex_hull_normals);
+  return convex_hull(points, convex_hull_normals, cntx);
 };
 
 } // namespace qh
