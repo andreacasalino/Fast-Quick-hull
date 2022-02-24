@@ -7,18 +7,12 @@
 
 #include "src/ImporterSTL.h"
 #include <iostream>
-using namespace std;
 
 int main() {
-  // create a solver
-  qh::QuickHullSolver solver
-#ifdef THREAD_POOL_ENABLED // try to use 4 threads for the pool
-      (4)
-#endif
-          ;
+  const std::size_t thread_pool_size = ; // TODO explain
 
   // import the cloud from existing STL files
-  list<std::string> stlNames;
+  std::vector<std::string> stlNames;
   stlNames.push_back("Dolphin"); // 672 vertices
   stlNames.push_back("Giraffe"); // 788 vertices
   stlNames.push_back("Hyppo");   // 2399 vertices
@@ -26,13 +20,20 @@ int main() {
   stlNames.push_back("Eagle");   // 4271 vertices
 
   for (auto it = stlNames.begin(); it != stlNames.end(); ++it) {
-    // impor the stl and compute the convex hull. Then, log the results
+    // import the stl and compute the convex hull. Then, log the results
     // You can use the python script Plotter.py to display the results
-    cout << "computing convex hull of " << *it;
-    logConvexhull(solver, importSTL("Animals/" + *it + ".stl"), *it + ".json");
-    cout << " done" << endl;
-    cout << "call 'python Plotter.py " << *it << ".json' to see results" << endl
-         << endl;
+    std::cout << "computing convex hull of " << *it;
+    const auto vertices_cloud = importSTL("Animals/" + *it + ".stl");
+    // compute the convex hull of of the imported vertices cloud
+    auto convex_hull_facets_incidences = qh::convex_hull(
+        vertices_cloud.begin(), vertices_cloud.end(), to_hull_coordinate,
+        qh::ConvexHullContext{2000, thread_pool_size});
+    // log results
+    logConvexhull(convex_hull_facets_incidences, vertices_cloud, *it + ".json");
+    std::cout << " done" << std::endl;
+    std::cout << "call 'python Plotter.py " << *it << ".json' to see results"
+              << std::endl
+              << std::endl;
   }
 
   return EXIT_SUCCESS;
