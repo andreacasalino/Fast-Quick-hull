@@ -18,8 +18,8 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Fast-Quick-Hull
 )
 
-# target_compile_definitions(${TEST_NAME} PUBLIC
-    # -D TEST_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/"
-# )
+target_compile_definitions(${TEST_NAME} PUBLIC
+    -D ANIMALS_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/Samples/Animals/"
+)
 
 install(TARGETS ${TEST_NAME})
