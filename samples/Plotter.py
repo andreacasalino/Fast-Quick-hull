@@ -68,7 +68,8 @@ def plot_CH(file, color, ax):
     ax.set_ylim3d(lim[0], lim[1])
     ax.set_zlim3d(lim[0], lim[1])
 
-def plot_STL(file, ax):
+# https://pypi.org/project/numpy-stl/
+def plot_STL(file, ax):	
     # Load the STL files and add the vectors to the plot
     your_mesh = mesh.Mesh.from_file(file)
     ax.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors))
