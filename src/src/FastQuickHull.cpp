@@ -8,7 +8,6 @@
 #include <Hull/Hull.h>
 #include <QuickHull/FastQuickHull.h>
 
-#include "Definitions.h"
 #include "DistanceMapper.h"
 
 #include <algorithm>
@@ -32,7 +31,7 @@ static const int DEAFULT_POOL_SIZE = get_default_pool_size();
 int get_pool_size(const std::optional<std::size_t> &thread_pool_size) {
   int pool_size = 1;
   if (thread_pool_size != std::nullopt) {
-    if (*thread_pool_size <= 1) {
+    if (*thread_pool_size == 0) {
       pool_size = DEAFULT_POOL_SIZE;
     } else {
       pool_size = *thread_pool_size;
@@ -56,17 +55,15 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
   {
     auto th_id = omp_get_thread_num();
     if (0 == th_id) {
-#pragma omp barrier
-      mapper.update();
-#pragma omp barrier
       for (const auto index : initial_tethraedron) {
         points.invalidateVertex(index);
       }
+#pragma omp barrier
+      mapper.update();
+#pragma omp barrier
 
-      for (std::size_t iteration = 0;
-           (iteration < cntx.max_iterations) &&
-           (mapper.getDistancesFacetsMap().begin()->first >
-            QHULL_GEOMETRIC_TOLLERANCE);
+      for (std::size_t iteration = 0; (iteration <= cntx.max_iterations) &&
+                                      (!mapper.getDistancesFacetsMap().empty());
            ++iteration) {
         const auto &[facet, vertex] =
             mapper.getDistancesFacetsMap().begin()->second;
@@ -77,10 +74,10 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
                          });
         hull.update(points.accessVertex(vertex),
                     std::distance(hull.getFacets().begin(), facets_it));
+        points.invalidateVertex(vertex);
 #pragma omp barrier
         mapper.update();
 #pragma omp barrier
-        points.invalidateVertex(vertex);
       }
       life = false;
 #pragma omp barrier

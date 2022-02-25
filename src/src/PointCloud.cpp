@@ -22,10 +22,11 @@ float get_vertex_distance(const hull::Coordinate &facet_point,
 }
 } // namespace
 
-PointCloud::FarthestVertex
+std::optional<PointCloud::FarthestVertex>
 PointCloud::getFarthest(const hull::Coordinate &point_on_facet,
                         const hull::Coordinate &facet_normal) const {
-  PointCloud::FarthestVertex result = PointCloud::FarthestVertex{0, 0.f};
+  PointCloud::FarthestVertex result =
+      PointCloud::FarthestVertex{0, QHULL_GEOMETRIC_TOLLERANCE};
   float distance;
   for (std::size_t pos = 0; pos < points.size(); ++pos) {
     if (points_still_free[pos]) {
@@ -36,6 +37,9 @@ PointCloud::getFarthest(const hull::Coordinate &point_on_facet,
       }
     }
   }
+  if (result.distance == QHULL_GEOMETRIC_TOLLERANCE) {
+    return std::nullopt;
+  }
   return result;
 }
 
@@ -43,18 +47,18 @@ namespace {
 template <typename DistanceComputation>
 std::size_t
 farthest_to_subject(const std::vector<hull::Coordinate> &points,
-                    const DistanceComputation &distance_to_subject) {
+                    const DistanceComputation &squared_distance_to_subject) {
   float max_distance = QHULL_GEOMETRIC_TOLLERANCE_SQUARED;
   std::size_t result = 0;
   float squared_distance;
   for (std::size_t k = 0; k < points.size(); ++k) {
-    squared_distance = distance_to_subject(points[k]);
+    squared_distance = squared_distance_to_subject(points[k]);
     if (squared_distance > max_distance) {
       result = k;
       max_distance = squared_distance;
     }
   }
-  if (max_distance <= QHULL_GEOMETRIC_TOLLERANCE_SQUARED) {
+  if (max_distance == QHULL_GEOMETRIC_TOLLERANCE_SQUARED) {
     throw Error{"The passed cloud has null volume"};
   }
   return result;

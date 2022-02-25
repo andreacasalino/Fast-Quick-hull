@@ -13,7 +13,7 @@ The relevant code is contained in ./src, while ./samples contains examples showi
 In particular, after running the samples, some .json files will be produced storing the results.
 You can use the python script Plotter.py to visualize results in cool **3d plot**, by running:
 
- * `python3 Plotter.py $(name of the .json to plot)`
+ * `python3 Plotter.py ${JSON_TO_PLOT_NAME}`
 
 ## USAGE
 

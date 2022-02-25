@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Hull/Coordinate.h>
+
+#include <optional>
 #include <vector>
 
 namespace qh {
@@ -14,8 +16,9 @@ public:
     std::size_t vertex;
     float distance;
   };
-  FarthestVertex getFarthest(const hull::Coordinate &point_on_facet,
-                             const hull::Coordinate &facet_normal) const;
+  std::optional<FarthestVertex>
+  getFarthest(const hull::Coordinate &point_on_facet,
+              const hull::Coordinate &facet_normal) const;
 
   const hull::Coordinate &accessVertex(const std::size_t index) const {
     return points[index];
