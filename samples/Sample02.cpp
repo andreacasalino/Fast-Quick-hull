@@ -20,16 +20,19 @@ int main() {
   stlNames.push_back("Eagle");   // 4271 vertices
 
   for (auto it = stlNames.begin(); it != stlNames.end(); ++it) {
-    // import the stl and compute the convex hull. Then, log the results
-    // You can use the python script Plotter.py to display the results
     std::cout << "computing convex hull of " << *it;
+
+    // import the stl describing the shape of this animal
     const auto vertices_cloud = importAnimalSTL(*it);
+
     // compute the convex hull of of the imported vertices cloud
     std::vector<hull::Coordinate> convex_hull_normals;
     auto convex_hull_facets_incidences = qh::convex_hull(
         vertices_cloud.begin(), vertices_cloud.end(), to_hull_coordinate,
         convex_hull_normals, qh::ConvexHullContext{2000, thread_pool_size});
-    // log results
+
+    // Log the result into a textual file, which can be visualized
+    // running the python script Plotter.py
     logConvexhull(convex_hull_facets_incidences, convex_hull_normals,
                   vertices_cloud, *it + ".json");
     std::cout << " done" << std::endl;
