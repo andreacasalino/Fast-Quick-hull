@@ -15,6 +15,8 @@ You can use the python script Plotter.py to visualize results in cool **3d plot*
 
  * `python3 Plotter.py ${JSON_TO_PLOT_NAME}`
 
+Note that you may need to use **pip** to install eventually missing python package to make the script run.
+
 ## USAGE
 
 Haven't yet left a **star**? Do it now! :).
