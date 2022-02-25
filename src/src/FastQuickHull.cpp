@@ -11,6 +11,7 @@
 #include "DistanceMapper.h"
 
 #include <algorithm>
+#include <map>
 #include <omp.h>
 
 namespace qh {
@@ -40,14 +41,23 @@ int get_pool_size(const std::optional<std::size_t> &thread_pool_size) {
   return pool_size;
 }
 
-hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
+using HullIndexVSPointCloudIndexMap = std::map<std::size_t, std::size_t>;
+
+hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx,
+                        HullIndexVSPointCloudIndexMap &indices_map) {
   DistanceMapper mapper(points);
+  indices_map.clear();
 
   auto initial_tethraedron = points.getInitialTethraedron();
   hull::Hull hull(points.accessVertex(initial_tethraedron[0]),
                   points.accessVertex(initial_tethraedron[1]),
                   points.accessVertex(initial_tethraedron[2]),
                   points.accessVertex(initial_tethraedron[3]), mapper);
+
+  indices_map.emplace(0, initial_tethraedron[0]);
+  indices_map.emplace(1, initial_tethraedron[1]);
+  indices_map.emplace(2, initial_tethraedron[2]);
+  indices_map.emplace(3, initial_tethraedron[3]);
 
   bool life = true;
   auto pool_size = get_pool_size(cntx.thread_pool_size);
@@ -72,6 +82,7 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
                          [&facet = facet](const hull::FacetPtr &element) {
                            return facet == element.get();
                          });
+        indices_map.emplace(hull.getVertices().size(), vertex);
         hull.update(points.accessVertex(vertex),
                     std::distance(hull.getFacets().begin(), facets_it));
         points.invalidateVertex(vertex);
@@ -96,12 +107,15 @@ hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx) {
   return hull;
 }
 
-std::vector<FacetIncidences> get_indices(const hull::Facets &faces) {
+std::vector<FacetIncidences>
+get_indices(const hull::Facets &faces,
+            const HullIndexVSPointCloudIndexMap &indices_map) {
   std::vector<FacetIncidences> result;
   result.reserve(faces.size());
   for (const auto &face : faces) {
-    result.push_back(
-        FacetIncidences{face->vertexA, face->vertexB, face->vertexC});
+    result.push_back(FacetIncidences{indices_map.find(face->vertexA)->second,
+                                     indices_map.find(face->vertexB)->second,
+                                     indices_map.find(face->vertexC)->second});
   }
   return result;
 }
@@ -120,8 +134,9 @@ std::vector<FacetIncidences>
 convex_hull(const std::vector<hull::Coordinate> &points,
             const ConvexHullContext &cntx) {
   PointCloud cloud(points);
-  auto hull = convex_hull_(cloud, cntx);
-  return get_indices(hull.getFacets());
+  HullIndexVSPointCloudIndexMap indices_map;
+  auto hull = convex_hull_(cloud, cntx, indices_map);
+  return get_indices(hull.getFacets(), indices_map);
 }
 
 std::vector<FacetIncidences>
@@ -129,9 +144,10 @@ convex_hull(const std::vector<hull::Coordinate> &points,
             std::vector<hull::Coordinate> &convex_hull_normals,
             const ConvexHullContext &cntx) {
   PointCloud cloud(points);
-  auto hull = convex_hull_(cloud, cntx);
+  HullIndexVSPointCloudIndexMap indices_map;
+  auto hull = convex_hull_(cloud, cntx, indices_map);
   convex_hull_normals = get_normals(hull.getFacets());
-  return get_indices(hull.getFacets());
+  return get_indices(hull.getFacets(), indices_map);
 }
 
 } // namespace qh

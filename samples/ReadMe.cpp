@@ -16,8 +16,9 @@ int main() {
   // A collection of 3d coordinates
   std::vector<MyVector> points;
 
-  // compute the incidences (index of the vertices at the boundaries
-  // of each facet), of the facets constituting the convex hull of the points
+  // compute the incidences (index of the vertices in the passed points cloud,
+  // which delimits each facet), of the facets constituting the convex hull of
+  // the points
   std::vector<qh::FacetIncidences>
       incidences = // qh::FacetIncidences is an array of incidences:
                    // std::array<std::size_t, 3>
