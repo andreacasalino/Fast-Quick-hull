@@ -54,18 +54,18 @@ void DistanceMapper::updateRemovedFacet(const hull::Facet *facet) {
 void DistanceMapper::update() {
 // changed facets
 #pragma omp for
-  for (const auto *changed : last_notification->changed) {
-    updateChangedFacet(changed);
+  for (int i = 0; i < last_notification->changed.size(); ++i) {
+    updateChangedFacet(last_notification->changed[i]);
   }
   // added facets
 #pragma omp for
-  for (const auto *added : last_notification->added) {
-    updateAddedFacet(added);
+  for (int i = 0; i < last_notification->added.size(); ++i) {
+    updateAddedFacet(last_notification->added[i]);
   }
 // removed facets
 #pragma omp for
-  for (const auto &removed : last_notification->removed) {
-    updateRemovedFacet(removed.get());
+  for (int i = 0; i < last_notification->removed.size(); ++i) {
+    updateRemovedFacet(last_notification->removed[i].get());
   }
 }
 } // namespace qh

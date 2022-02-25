@@ -35,7 +35,7 @@ int get_pool_size(const std::optional<std::size_t> &thread_pool_size) {
     if (*thread_pool_size == 0) {
       pool_size = DEAFULT_POOL_SIZE;
     } else {
-      pool_size = *thread_pool_size;
+      pool_size = static_cast<int>(*thread_pool_size);
     }
   }
   return pool_size;
