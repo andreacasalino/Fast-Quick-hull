@@ -8,6 +8,7 @@
 #include "Logger.h"
 #include <algorithm>
 #include <fstream>
+#include <random>
 
 hull::Coordinate to_hull_coordinate(const Vector3d &to_convert) {
   return hull::Coordinate{to_convert.x(), to_convert.y(), to_convert.z()};
@@ -75,4 +76,23 @@ void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
                   return element.z;
                 });
   f << '}';
+}
+
+float sample() {
+  return 2.f * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 1.f;
+}
+
+static bool reset_seed = true;
+
+std::vector<Vector3d> sampleCloud(const std::size_t size) {
+  if (reset_seed) {
+    srand(0);
+    reset_seed = false;
+  }
+  std::vector<Vector3d> result;
+  result.reserve(size);
+  for (std::size_t k = 0; k < size; ++k) {
+    result.emplace_back(sample(), sample(), sample());
+  }
+  return result;
 }

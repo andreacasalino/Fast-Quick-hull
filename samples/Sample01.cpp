@@ -8,8 +8,6 @@
 #include <Logger.h>
 #include <iostream>
 
-std::vector<Vector3d> sampleCloud(const std::size_t size);
-
 int main() {
   // randomly sample a point cloud of a given number of points
   auto cloud = sampleCloud(50);
@@ -29,17 +27,4 @@ int main() {
             << std::endl;
 
   return EXIT_SUCCESS;
-}
-
-float sample() {
-  return 2.f * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 1.f;
-}
-
-std::vector<Vector3d> sampleCloud(const std::size_t size) {
-  std::vector<Vector3d> result;
-  result.reserve(size);
-  for (std::size_t k = 0; k < size; ++k) {
-    result.emplace_back(sample(), sample(), sample());
-  }
-  return result;
 }

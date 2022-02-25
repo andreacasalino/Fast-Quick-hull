@@ -37,3 +37,5 @@ void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
                    const std::vector<hull::Coordinate> &convex_hull_normals,
                    const std::vector<Vector3d> &cloud,
                    const std::string &fileName);
+
+std::vector<Vector3d> sampleCloud(const std::size_t size);
