@@ -44,6 +44,9 @@ hull::Coordinate convert_function(const MyVector &vector) {
 
 Now you are free to compute the **convex hull** of a cloud of points:
 ```cpp
+// A collection of 3d coordinates
+std::vector<MyVector> points;
+
 // compute the incidences (index of the vertices at the boundaries
 // of each facet), of the facets constituting the convex hull of the points
 std::vector<qh::FacetIncidences>
