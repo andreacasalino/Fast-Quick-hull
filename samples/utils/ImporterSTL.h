@@ -13,3 +13,5 @@
  * as a point cloud of vertices.
  */
 std::vector<Vector3d> importSTL(const std::string &stlFileName);
+
+std::vector<Vector3d> importAnimalSTL(const std::string &animalName);

@@ -5,7 +5,7 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "src/ImporterSTL.h"
+#include <ImporterSTL.h>
 #include <iostream>
 
 int main() {
@@ -23,12 +23,12 @@ int main() {
     // import the stl and compute the convex hull. Then, log the results
     // You can use the python script Plotter.py to display the results
     std::cout << "computing convex hull of " << *it;
-    const auto vertices_cloud = importSTL("Animals/" + *it + ".stl");
+    const auto vertices_cloud = importAnimalSTL(*it);
     // compute the convex hull of of the imported vertices cloud
     std::vector<hull::Coordinate> convex_hull_normals;
     auto convex_hull_facets_incidences = qh::convex_hull(
         vertices_cloud.begin(), vertices_cloud.end(), to_hull_coordinate,
-        qh::ConvexHullContext{2000, thread_pool_size}, convex_hull_normals);
+        convex_hull_normals, qh::ConvexHullContext{2000, thread_pool_size});
     // log results
     logConvexhull(convex_hull_facets_incidences, convex_hull_normals,
                   vertices_cloud, *it + ".json");

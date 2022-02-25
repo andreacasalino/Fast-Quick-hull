@@ -13,30 +13,25 @@ target_link_libraries(Utils PUBLIC
     Fast-Quick-Hull
 )	
 
-target_compile_definitions(Utils PUBLIC
+target_compile_definitions(Utils PRIVATE
     -D ANIMALS_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/Animals/"
 )
 
-# sample 01
-add_executable(Sample01 Sample01.cpp)
-target_link_libraries(Sample01 PUBLIC 
+macro(MAKE_SAMPLE NAME)
+add_executable(${NAME} ${NAME}.cpp)
+target_link_libraries(${NAME} PUBLIC 
     Utils
 )	
-add_custom_command(TARGET Sample01 PRE_BUILD
+add_custom_command(TARGET ${NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/Plotter.py ${CMAKE_CURRENT_BINARY_DIR}/Plotter.py)
+endmacro()
+
+
+# sample 01
+MAKE_SAMPLE(Sample01)
 
 # sample 02
-add_executable(Sample02 Sample02.cpp)
-target_link_libraries(Sample02 PUBLIC 
-    Utils
-)		
-
-add_custom_command(TARGET Sample02 PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/Plotter.py ${CMAKE_CURRENT_BINARY_DIR}/Plotter.py)
-
-add_custom_command(TARGET Sample02 PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/Animals ${CMAKE_CURRENT_BINARY_DIR}/Animals
-)
+MAKE_SAMPLE(Sample02)
 
 # for readme file
 add_executable(ReadMe ReadMe.cpp)

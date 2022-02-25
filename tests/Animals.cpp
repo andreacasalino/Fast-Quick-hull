@@ -6,7 +6,7 @@
 TEST_CASE("Animals STL") {
   auto animal_name = GENERATE("Dolphin", "Eagle", "Giraffe", "Hyppo", "Snake");
 
-  auto cloud = importSTL(ANIMALS_FOLDER + std::string{animal_name} + ".stl");
+  auto cloud = importAnimalSTL(animal_name);
 
   qh::convex_hull(cloud.begin(), cloud.end(), to_hull_coordinate,
                   qh::ConvexHullContext{2000, std::nullopt});

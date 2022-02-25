@@ -72,3 +72,7 @@ std::vector<Vector3d> importSTL(const std::string &stlFileName) {
   f.close();
   return imported_vertices;
 }
+
+std::vector<Vector3d> importAnimalSTL(const std::string &animalName) {
+  return importSTL(ANIMALS_FOLDER + animalName + ".stl");
+}

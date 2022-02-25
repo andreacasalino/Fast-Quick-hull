@@ -5,7 +5,7 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include "src/Logger.h"
+#include <Logger.h>
 #include <iostream>
 
 std::vector<Vector3d> sampleCloud(const std::size_t size);
@@ -18,7 +18,7 @@ int main() {
   std::vector<hull::Coordinate> convex_hull_normals;
   auto convex_hull_facets_incidences =
       qh::convex_hull(cloud.begin(), cloud.end(), to_hull_coordinate,
-                      qh::ConvexHullContext{}, convex_hull_normals);
+                      convex_hull_normals, qh::ConvexHullContext{});
 
   // Log the result into a textual file, which can be visualized
   // running the python script Plotter.py
