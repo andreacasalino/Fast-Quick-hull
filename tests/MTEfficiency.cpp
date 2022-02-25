@@ -45,7 +45,7 @@ TimeUnit total_time(const std::vector<TimeUnit> &times) {
   return result;
 }
 
-TEST_CASE("Profiling serial vs mt") {
+TEST_CASE("Profiling serial vs mt", "[!mayfail]") {
   const std::size_t trials = 10;
   auto cloud = sampleCloud(50000);
 
