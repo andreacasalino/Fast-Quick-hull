@@ -71,6 +71,6 @@ std::vector<Vector3d> importSTL(const std::string &stlFileName) {
   return imported_vertices;
 }
 
-std::vector<Vector3d> importAnimalSTL(const std::string &animalName) {
-  return importSTL(ANIMALS_FOLDER + animalName + ".stl");
+std::string getAnimalSTLLocation(const std::string &animalName) {
+  return std::string(ANIMALS_FOLDER + animalName + ".stl");
 }

@@ -26,7 +26,8 @@ int main() {
     std::cout << "computing convex hull of " << *it;
 
     // import the stl describing the shape of this animal
-    const auto vertices_cloud = importAnimalSTL(*it);
+    const std::string stl_location = getAnimalSTLLocation(*it);
+    const auto vertices_cloud = importSTL(stl_location);
 
     // compute the convex hull of of the imported vertices cloud
     std::vector<hull::Coordinate> convex_hull_normals;
@@ -39,8 +40,8 @@ int main() {
     logConvexhull(convex_hull_facets_incidences, convex_hull_normals,
                   vertices_cloud, *it + ".json");
     std::cout << " done" << std::endl;
-    std::cout << "call 'python Plotter.py " << *it << ".json' to see results"
-              << std::endl
+    std::cout << "call 'python Plotter.py " << *it << ".json " << stl_location
+              << "' to see results" << std::endl
               << std::endl;
   }
 

@@ -6,6 +6,10 @@
 * report any bug to andrecasa91@gmail.com.
 """
 
+from stl import mesh
+from mpl_toolkits import mplot3d
+from matplotlib import pyplot
+
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
 import json
@@ -64,10 +68,18 @@ def plot_CH(file, color, ax):
     ax.set_ylim3d(lim[0], lim[1])
     ax.set_zlim3d(lim[0], lim[1])
 
-
+def plot_STL(file, ax):
+    # Load the STL files and add the vectors to the plot
+    your_mesh = mesh.Mesh.from_file(file)
+    ax.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors))
+    # Auto scale to the mesh size
+    scale = your_mesh.points.flatten()
+    ax.auto_scale_xyz(scale, scale, scale)
 
 logName = sys.argv[1]
+stlLocation = sys.argv[2]
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 plot_CH(logName, 'green', ax)
+plot_STL(stlLocation, ax)
 plt.show()

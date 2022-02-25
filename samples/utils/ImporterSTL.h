@@ -14,4 +14,4 @@
  */
 std::vector<Vector3d> importSTL(const std::string &stlFileName);
 
-std::vector<Vector3d> importAnimalSTL(const std::string &animalName);
+std::string getAnimalSTLLocation(const std::string &animalName);
