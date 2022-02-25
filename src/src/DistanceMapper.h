@@ -9,27 +9,45 @@
 
 #include <Hull/Hull.h>
 #include <QuickHull/FastQuickHull.h>
+
+#include "PointCloud.h"
+
 #include <map>
+#include <memory>
+#include <mutex>
 
 namespace qh {
-class QuickHullSolver::DistanceMapper : public hull::Observer {
+struct FacetAndFarthestVertex {
+  const hull::Facet *facet;
+  std::size_t vertex_index;
+};
+using DistancesFacetsMap =
+    std::multimap<float, FacetAndFarthestVertex, std::greater<float>>;
+
+class DistanceMapper : public hull::Observer {
 public:
-  DistanceMapper(CloudHandler &hndlr) : hndlr(hndlr){};
+  DistanceMapper(const PointCloud &cloud) : cloud(cloud){};
 
-  void AddedChangedFacets(
-      const std::list<const hull::Facet *> &added,
-      const std::list<const hull::Facet *> &changed) const override;
+  void update();
 
-  void
-  RemovedFacets(const std::list<const hull::Facet *> &removed) const override;
-
-  inline std::map<const hull::Facet *, std::pair<int, float>> &
-  getDistanceMap() const {
-    return this->distanceMap;
+  const DistancesFacetsMap &getDistancesFacetsMap() const {
+    return distances_facets_map;
   };
 
 protected:
-  CloudHandler &hndlr;
-  mutable std::map<const hull::Facet *, std::pair<int, float>> distanceMap;
+  const PointCloud &cloud;
+
+  std::unique_ptr<Notification> last_notification;
+  void hullChanges(Notification &&notification) override {
+    last_notification = std::make_unique<Notification>(std::move(notification));
+  };
+
+  void updateAddedFacet(const hull::Facet *facet);
+  void updateChangedFacet(const hull::Facet *facet);
+  void updateRemovedFacet(const hull::Facet *facet);
+
+  std::mutex maps_mtx;
+  DistancesFacetsMap distances_facets_map;
+  std::map<const hull::Facet *, float> facets_distances_map;
 };
 } // namespace qh

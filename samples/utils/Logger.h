@@ -7,8 +7,13 @@
 
 #pragma once
 
-/** @brief Just an example of 3d vector: you can use the one defined
- * in your favourite linear algebra library (Eigen, etc...)
+#include <QuickHull/FastQuickHull.h>
+
+#include <string>
+#include <vector>
+
+/** @brief Just an example of 3d coordinate representation: you can use the one
+ * defined in your favourite linear algebra library (Eigen, etc...)
  */
 class Vector3d {
 public:
@@ -26,10 +31,11 @@ private:
   float coordinates[3];
 };
 
-#include <QuickHull/FastQuickHull.h>
-#include <list>
-#include <string>
+hull::Coordinate to_hull_coordinate(const Vector3d &to_convert);
 
-void logConvexhull(qh::QuickHullSolver &solver,
-                   const std::list<Vector3d> &cloud,
+void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
+                   const std::vector<hull::Coordinate> &convex_hull_normals,
+                   const std::vector<Vector3d> &cloud,
                    const std::string &fileName);
+
+std::vector<Vector3d> sampleCloud(const std::size_t size);

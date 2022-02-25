@@ -5,88 +5,149 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
+#include <Hull/Hull.h>
+#include <QuickHull/FastQuickHull.h>
+
 #include "DistanceMapper.h"
-#include "DistanceMapperPool.h"
-#include <memory>
+
+#include <algorithm>
+#include <map>
+#include <omp.h>
 
 namespace qh {
-QuickHullSolver::QuickHullSolver(
-#ifdef THREAD_POOL_ENABLED
-    const std::size_t &poolSize
-#endif
-) {
-#ifdef THREAD_POOL_ENABLED
-  if (1 < poolSize) {
-    this->pool = std::make_shared<thpl::equi::Pool>(poolSize);
-  }
-#endif
-};
-
-void QuickHullSolver::_convexHull(std::vector<FacetIncidences> &indices,
-                                  std::vector<hull::Coordinate> *normals,
-                                  CloudHandler &hndlr) {
-  std::unique_ptr<DistanceMapper> obs;
-#ifdef THREAD_POOL_ENABLED
-  if (nullptr == this->pool) {
-    obs = std::make_unique<DistanceMapper>(hndlr);
-  } else {
-    obs = std::make_unique<DistanceMapperPool>(hndlr, this->pool);
-  }
-#else
-  obs = std::make_unique<DistanceMapper>(hndlr);
-#endif
-
-  std::pair<std::array<hull::Coordinate, 4>, std::array<std::size_t, 4>>
-      tethraedron = hndlr.getInitialTethraedron();
-  hull::Hull hull(tethraedron.first[0], tethraedron.first[1],
-                  tethraedron.first[2], tethraedron.first[3], obs.get());
-  std::map<const hull::Coordinate *, std::size_t> indiceMap;
+namespace {
+int get_default_pool_size() {
+  int result = 0;
+#pragma omp parallel
   {
-    auto itV = hull.getVertices().begin();
-    for (std::size_t k = 0; k < 4; ++k) {
-      indiceMap.emplace(&(*itV), tethraedron.second[k]);
-      ++itV;
+    if (0 == omp_get_thread_num()) {
+      result = omp_get_num_threads();
     }
   }
-
-  const std::map<const hull::Facet *, std::pair<int, float>> *distMap =
-      &obs->getDistanceMap();
-  std::map<const hull::Facet *, std::pair<int, float>>::const_iterator farthest,
-      itF;
-  std::size_t farthestPos;
-  for (std::size_t iter = 0; iter < this->maxIterations; ++iter) {
-    if (distMap->empty())
-      break;
-    farthest = distMap->begin();
-    itF = farthest;
-    ++itF;
-    for (itF; itF != distMap->end(); ++itF) {
-      if (itF->second.second > farthest->second.second) {
-        farthest = itF;
-      }
-    }
-    farthestPos = static_cast<std::size_t>(farthest->second.first);
-    hull.UpdateHull(hndlr.getCoordinate(farthest->second.first),
-                    *farthest->first);
-    indiceMap.emplace(&hull.getVertices().back(), farthestPos);
-    hndlr.invalidate(static_cast<int>(farthestPos));
-  }
-
-  // get incidences
-  indices.reserve(hull.getFacets().size());
-  for (auto f = hull.getFacets().begin(); f != hull.getFacets().end(); ++f) {
-    indices.emplace_back();
-    indices.back()[0] = indiceMap.find(f->A)->second;
-    indices.back()[1] = indiceMap.find(f->B)->second;
-    indices.back()[2] = indiceMap.find(f->C)->second;
-  }
-
-  if (nullptr != normals) {
-    // get normals
-    normals->reserve(hull.getFacets().size());
-    for (auto f = hull.getFacets().begin(); f != hull.getFacets().end(); ++f) {
-      normals->emplace_back(f->N);
-    }
-  }
+  return result;
 }
+
+static const int DEAFULT_POOL_SIZE = get_default_pool_size();
+
+int get_pool_size(const std::optional<std::size_t> &thread_pool_size) {
+  int pool_size = 1;
+  if (thread_pool_size != std::nullopt) {
+    if (*thread_pool_size == 0) {
+      pool_size = DEAFULT_POOL_SIZE;
+    } else {
+      pool_size = static_cast<int>(*thread_pool_size);
+    }
+  }
+  return pool_size;
+}
+
+using HullIndexVSPointCloudIndexMap = std::map<std::size_t, std::size_t>;
+
+hull::Hull convex_hull_(PointCloud &points, const ConvexHullContext &cntx,
+                        HullIndexVSPointCloudIndexMap &indices_map) {
+  DistanceMapper mapper(points);
+  indices_map.clear();
+
+  auto initial_tethraedron = points.getInitialTethraedron();
+  hull::Hull hull(points.accessVertex(initial_tethraedron[0]),
+                  points.accessVertex(initial_tethraedron[1]),
+                  points.accessVertex(initial_tethraedron[2]),
+                  points.accessVertex(initial_tethraedron[3]), mapper);
+
+  indices_map.emplace(0, initial_tethraedron[0]);
+  indices_map.emplace(1, initial_tethraedron[1]);
+  indices_map.emplace(2, initial_tethraedron[2]);
+  indices_map.emplace(3, initial_tethraedron[3]);
+
+  bool life = true;
+  auto pool_size = get_pool_size(cntx.thread_pool_size);
+#pragma omp parallel num_threads(pool_size)
+  {
+    auto th_id = omp_get_thread_num();
+    if (0 == th_id) {
+      for (const auto index : initial_tethraedron) {
+        points.invalidateVertex(index);
+      }
+#pragma omp barrier
+      mapper.update();
+#pragma omp barrier
+
+      for (std::size_t iteration = 0; (iteration <= cntx.max_iterations) &&
+                                      (!mapper.getDistancesFacetsMap().empty());
+           ++iteration) {
+        const auto &[facet, vertex] =
+            mapper.getDistancesFacetsMap().begin()->second;
+        auto facets_it =
+            std::find_if(hull.getFacets().begin(), hull.getFacets().end(),
+                         [&facet = facet](const hull::FacetPtr &element) {
+                           return facet == element.get();
+                         });
+        indices_map.emplace(hull.getVertices().size(), vertex);
+        hull.update(points.accessVertex(vertex),
+                    std::distance(hull.getFacets().begin(), facets_it));
+        points.invalidateVertex(vertex);
+#pragma omp barrier
+        mapper.update();
+#pragma omp barrier
+      }
+      life = false;
+#pragma omp barrier
+    } else {
+      while (true) {
+#pragma omp barrier
+        if (!life) {
+          break;
+        }
+        mapper.update();
+#pragma omp barrier
+      };
+    }
+  }
+
+  return hull;
+}
+
+std::vector<FacetIncidences>
+get_indices(const hull::Facets &faces,
+            const HullIndexVSPointCloudIndexMap &indices_map) {
+  std::vector<FacetIncidences> result;
+  result.reserve(faces.size());
+  for (const auto &face : faces) {
+    result.push_back(FacetIncidences{indices_map.find(face->vertexA)->second,
+                                     indices_map.find(face->vertexB)->second,
+                                     indices_map.find(face->vertexC)->second});
+  }
+  return result;
+}
+
+std::vector<hull::Coordinate> get_normals(const hull::Facets &faces) {
+  std::vector<hull::Coordinate> result;
+  result.reserve(faces.size());
+  for (const auto &face : faces) {
+    result.push_back(face->normal);
+  }
+  return result;
+}
+} // namespace
+
+std::vector<FacetIncidences>
+convex_hull(const std::vector<hull::Coordinate> &points,
+            const ConvexHullContext &cntx) {
+  PointCloud cloud(points);
+  HullIndexVSPointCloudIndexMap indices_map;
+  auto hull = convex_hull_(cloud, cntx, indices_map);
+  return get_indices(hull.getFacets(), indices_map);
+}
+
+std::vector<FacetIncidences>
+convex_hull(const std::vector<hull::Coordinate> &points,
+            std::vector<hull::Coordinate> &convex_hull_normals,
+            const ConvexHullContext &cntx) {
+  PointCloud cloud(points);
+  HullIndexVSPointCloudIndexMap indices_map;
+  auto hull = convex_hull_(cloud, cntx, indices_map);
+  convex_hull_normals = get_normals(hull.getFacets());
+  return get_indices(hull.getFacets(), indices_map);
+}
+
 } // namespace qh
