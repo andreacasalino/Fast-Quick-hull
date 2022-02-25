@@ -1,19 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include <QuickHull/FastQuickHull.h>
+#include <ImporterSTL.h>
 
-#include <memory>
+TEST_CASE("Animals STL") {
+  auto animal_name = GENERATE("Dolphin", "Eagle", "Giraffe", "Hyppo", "Snake");
 
-std::vector<hull::Coordinate> import_STL(const std::string &fileName) {
-  std::string path = ANIMALS_FOLDER + fileName + ".stl";
-  // TODO
-};
+  auto cloud = importSTL(ANIMALS_FOLDER + std::string{animal_name} + ".stl");
 
-TEST_CASE("Random clouds") {
-  auto file_name = GENERATE("Dolphin", "Eagle", "Giraffe", "Hyppo", "Snake");
-
-  auto animal = import_STL(file_name);
-
-  qh::convex_hull(animal, qh::ConvexHullContext{2000, std::nullopt});
+  qh::convex_hull(cloud.begin(), cloud.end(), to_hull_coordinate,
+                  qh::ConvexHullContext{2000, std::nullopt});
 }

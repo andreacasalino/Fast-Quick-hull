@@ -16,10 +16,8 @@ target_link_libraries(${TEST_NAME} PUBLIC
     Catch2::Catch2
     Catch2::Catch2WithMain
     Fast-Quick-Hull
+    Utils
 )
 
-target_compile_definitions(${TEST_NAME} PUBLIC
-    -D ANIMALS_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/Samples/Animals/"
-)
 
 install(TARGETS ${TEST_NAME})

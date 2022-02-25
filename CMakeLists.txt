@@ -19,7 +19,8 @@ add_subdirectory(src)
 
 option(Fast-Quick-Hull-BUILD_SAMPLES "Build the samples showing how to use the package" ON)
 if(Fast-Quick-Hull-BUILD_SAMPLES)
-   add_subdirectory(Samples)
+    project(Fast-Quick-Hull-Samples)
+   add_subdirectory(samples)
 endif()
 
 option(BUILD_QUICK_HULL_TESTS "" OFF)

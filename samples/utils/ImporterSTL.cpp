@@ -23,6 +23,7 @@ std::vector<std::string> splitta_riga(const std::string &riga) {
     slices.emplace_back();
     iss >> slices.back();
   }
+  return slices;
 }
 
 std::vector<Vector3d> importSTL(const std::string &stlFileName) {
