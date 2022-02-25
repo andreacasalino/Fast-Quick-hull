@@ -9,7 +9,10 @@
 #include <iostream>
 
 int main() {
-  const std::size_t thread_pool_size = 1; // TODO explain
+  const std::size_t thread_pool_size =
+      1; // setting 1 is like not using at all the thread pool, 0 exploits all
+         // possible threads, a different number specify the exact number of
+         // threads to use
 
   // import the cloud from existing STL files
   std::vector<std::string> stlNames;

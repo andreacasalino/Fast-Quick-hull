@@ -37,7 +37,6 @@ std::vector<Vector3d> importSTL(const std::string &stlFileName) {
 
   std::size_t k;
   std::getline(f, line);
-  float V_temp[3];
   float toll2 = TOLLERANCE_CLONE * TOLLERANCE_CLONE;
   while (true) {
     std::getline(f, line);
@@ -49,21 +48,20 @@ std::vector<Vector3d> importSTL(const std::string &stlFileName) {
     for (k = 0; k < 3; k++) {
       std::getline(f, line);
       slices = splitta_riga(line);
-      V_temp[0] = static_cast<float>(atof(slices[0].c_str()));
-      V_temp[1] = static_cast<float>(atof(slices[1].c_str()));
-      V_temp[2] = static_cast<float>(atof(slices[2].c_str()));
+      float x = static_cast<float>(atof(slices[1].c_str()));
+      float y = static_cast<float>(atof(slices[2].c_str()));
+      float z = static_cast<float>(atof(slices[3].c_str()));
 
       auto it_vertices =
           std::find_if(imported_vertices.begin(), imported_vertices.end(),
-                       [&V_temp, &toll2](const Vector3d &v) {
-                         float distance =
-                             (V_temp[0] - v.x()) * (V_temp[0] - v.x());
-                         distance += (V_temp[1] - v.y()) * (V_temp[1] - v.y());
-                         distance += (V_temp[2] - v.z()) * (V_temp[2] - v.z());
+                       [&](const Vector3d &v) {
+                         float distance = (x - v.x()) * (y - v.x());
+                         distance += (y - v.y()) * (y - v.y());
+                         distance += (z - v.z()) * (z - v.z());
                          return distance < toll2;
                        });
       if (it_vertices == imported_vertices.end()) {
-        imported_vertices.emplace_back(V_temp[0], V_temp[1], V_temp[2]);
+        imported_vertices.emplace_back(x, y, z);
       }
     }
     std::getline(f, line);

@@ -80,53 +80,58 @@ void add(hull::Coordinate &subject, const hull::Coordinate &to_add,
 class DistanceToSegment {
 public:
   DistanceToSegment(const hull::Coordinate &a, const hull::Coordinate &b)
-      : a(a), b_minus_a(delta(b, a)),
-        b_minus_a_dot(hull::dot(b_minus_a, b_minus_a)) {}
+      : a(a) {
+    ba_delta = delta(b, a);
+    ba_delta_dot = hull::dot(ba_delta, ba_delta);
+  }
 
   float operator()(const hull::Coordinate &point) const {
-    float s = hull::dot(delta(point, a), b_minus_a) / b_minus_a_dot;
+    float s = hull::dot(delta(point, a), ba_delta) / ba_delta_dot;
     hull::Coordinate result = delta(a, point);
-    add(result, b_minus_a, s);
+    add(result, ba_delta, s);
     return hull::dot(result, result);
   };
 
 private:
   const hull::Coordinate a;
-  const hull::Coordinate b_minus_a;
-  const float b_minus_a_dot;
+  hull::Coordinate ba_delta;
+  float ba_delta_dot;
 };
 
 class DistanceToPlane {
 public:
   DistanceToPlane(const hull::Coordinate &a, const hull::Coordinate &b,
                   const hull::Coordinate &c)
-      : a(a), b_minus_a(delta(b, a)),
-        b_minus_a_dot(hull::dot(b_minus_a, b_minus_a)), c_minus_a(delta(c, a)),
-        c_minus_a_dot(hull::dot(c_minus_a, c_minus_a)),
-        b_minus_a_dot_c_minus_a(hull::dot(b_minus_a, c_minus_a)) {}
+      : a(a) {
+    ba_delta = delta(b, a);
+    ba_delta_dot = hull::dot(ba_delta, ba_delta);
+    ca_delta = delta(c, a);
+    ca_delta_dot = hull::dot(ca_delta, ca_delta);
+    mixed_dot = hull::dot(ca_delta, ba_delta);
+  }
 
   float operator()(const hull::Coordinate &point) const {
-    float c1 = hull::dot(delta(point, a), b_minus_a);
-    float c2 = hull::dot(delta(point, a), c_minus_a);
+    auto pa_delta = delta(point, a);
+    float c1 = hull::dot(pa_delta, ba_delta);
+    float c2 = hull::dot(pa_delta, ca_delta);
 
-    float beta = (c_minus_a_dot * c1 - b_minus_a_dot_c_minus_a * c2) /
-                 (b_minus_a_dot * c_minus_a_dot -
-                  b_minus_a_dot_c_minus_a * b_minus_a_dot_c_minus_a);
-    float gamma = (c2 - beta * b_minus_a_dot_c_minus_a) / c_minus_a_dot;
+    float beta = (mixed_dot * c2 - ca_delta_dot * c1) /
+                 (mixed_dot * mixed_dot - ba_delta_dot * ca_delta_dot);
+    float gamma = (c1 - beta * ba_delta_dot) / mixed_dot;
 
     hull::Coordinate result = delta(a, point);
-    add(result, b_minus_a, beta);
-    add(result, c_minus_a, gamma);
+    add(result, ba_delta, beta);
+    add(result, ca_delta, gamma);
     return hull::dot(result, result);
   }
 
 private:
   const hull::Coordinate a;
-  const hull::Coordinate b_minus_a;
-  const float b_minus_a_dot;
-  const hull::Coordinate c_minus_a;
-  const float c_minus_a_dot;
-  const float b_minus_a_dot_c_minus_a;
+  hull::Coordinate ba_delta;
+  float ba_delta_dot;
+  hull::Coordinate ca_delta;
+  float ca_delta_dot;
+  float mixed_dot;
 };
 } // namespace
 
@@ -142,18 +147,22 @@ std::vector<std::size_t> PointCloud::getInitialTethraedron() const {
         return hull::squaredDistance(subject, point);
       }));
 
-  DistanceToSegment segment_operator(points[result[0]], points[result[1]]);
-  result.push_back(farthest_to_subject(
-      points, [&segment_operator](const hull::Coordinate &point) {
-        return segment_operator(point);
-      }));
+  {
+    DistanceToSegment segment_operator(points[result[0]], points[result[1]]);
+    result.push_back(farthest_to_subject(
+        points, [&segment_operator](const hull::Coordinate &point) {
+          return segment_operator(point);
+        }));
+  }
 
-  DistanceToPlane plane_operator(points[result[0]], points[result[1]],
-                                 points[result[2]]);
-  result.push_back(farthest_to_subject(
-      points, [&plane_operator](const hull::Coordinate &point) {
-        return plane_operator(point);
-      }));
+  {
+    DistanceToPlane plane_operator(points[result[0]], points[result[1]],
+                                   points[result[2]]);
+    result.push_back(farthest_to_subject(
+        points, [&plane_operator](const hull::Coordinate &point) {
+          return plane_operator(point);
+        }));
+  }
 
   return result;
 }
