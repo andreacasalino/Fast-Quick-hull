@@ -9,7 +9,9 @@ PointCloud::PointCloud(const std::vector<hull::Coordinate> &points)
   if (points.size() < 4) {
     throw Error{"The point cloud should have at least 4 points"};
   }
-  points_still_free = std::vector<bool>(points.size(), true);
+  for (std::size_t k = 0; k < points.size(); ++k) {
+    open_set[&points[k]] = k;
+  }
 }
 
 namespace {
@@ -28,13 +30,11 @@ PointCloud::getFarthest(const hull::Coordinate &point_on_facet,
   PointCloud::FarthestVertex result =
       PointCloud::FarthestVertex{0, QHULL_GEOMETRIC_TOLLERANCE};
   float distance;
-  for (std::size_t pos = 0; pos < points.size(); ++pos) {
-    if (points_still_free[pos]) {
-      distance = get_vertex_distance(point_on_facet, facet_normal, points[pos]);
-      if (result.distance < distance) {
-        result.distance = distance;
-        result.vertex = pos;
-      }
+  for (auto [point, pos] : open_set) {
+    distance = get_vertex_distance(point_on_facet, facet_normal, *point);
+    if (result.distance < distance) {
+      result.distance = distance;
+      result.vertex = pos;
     }
   }
   if (result.distance == QHULL_GEOMETRIC_TOLLERANCE) {
@@ -53,7 +53,7 @@ farthest_to_subject(const std::vector<hull::Coordinate> &points,
   float squared_distance;
   for (std::size_t k = 0; k < points.size(); ++k) {
     squared_distance = squared_distance_to_subject(points[k]);
-    if (squared_distance > max_distance) {
+    if (max_distance < squared_distance) {
       result = k;
       max_distance = squared_distance;
     }
@@ -71,7 +71,7 @@ hull::Coordinate delta(const hull::Coordinate &v1, const hull::Coordinate &v2) {
 }
 
 void add(hull::Coordinate &subject, const hull::Coordinate &to_add,
-         const float to_add_coeff) {
+         float to_add_coeff) {
   subject.x += to_add_coeff * to_add.x;
   subject.y += to_add_coeff * to_add.y;
   subject.z += to_add_coeff * to_add.z;
@@ -93,7 +93,7 @@ public:
   };
 
 private:
-  const hull::Coordinate a;
+  hull::Coordinate a;
   hull::Coordinate ba_delta;
   float ba_delta_dot;
 };
@@ -126,7 +126,7 @@ public:
   }
 
 private:
-  const hull::Coordinate a;
+  hull::Coordinate a;
   hull::Coordinate ba_delta;
   float ba_delta_dot;
   hull::Coordinate ca_delta;
@@ -135,33 +135,30 @@ private:
 };
 } // namespace
 
-std::vector<std::size_t> PointCloud::getInitialTethraedron() const {
-  std::vector<std::size_t> result;
-  result.reserve(4);
+std::array<std::size_t, 4> PointCloud::getInitialTethraedron() const {
+  std::array<std::size_t, 4> result;
+  result[0] = 0;
 
-  result.push_back(0);
-
-  result.push_back(farthest_to_subject(
-      points,
-      [&subject = points[result.front()]](const hull::Coordinate &point) {
-        return hull::squaredDistance(subject, point);
-      }));
+  result[1] = farthest_to_subject(points, [&subject = points[result.front()]](
+                                              const hull::Coordinate &point) {
+    return hull::squaredDistance(subject, point);
+  });
 
   {
     DistanceToSegment segment_operator(points[result[0]], points[result[1]]);
-    result.push_back(farthest_to_subject(
+    result[2] = farthest_to_subject(
         points, [&segment_operator](const hull::Coordinate &point) {
           return segment_operator(point);
-        }));
+        });
   }
 
   {
     DistanceToPlane plane_operator(points[result[0]], points[result[1]],
                                    points[result[2]]);
-    result.push_back(farthest_to_subject(
+    result[3] = farthest_to_subject(
         points, [&plane_operator](const hull::Coordinate &point) {
           return plane_operator(point);
-        }));
+        });
   }
 
   return result;

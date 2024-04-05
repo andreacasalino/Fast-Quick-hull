@@ -84,7 +84,6 @@ convex_hull(const VerticesIterator &vertices_begin,
             std::vector<hull::Coordinate> &convex_hull_normals,
             const ConvexHullContext &cntx = ConvexHullContext{}) {
   std::vector<hull::Coordinate> points;
-  points.reserve(std::distance(vertices_begin, vertices_end));
   std::for_each(vertices_begin, vertices_end,
                 [&points, &converter](const auto &element) {
                   points.push_back(converter(element));

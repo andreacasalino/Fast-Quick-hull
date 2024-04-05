@@ -12,42 +12,47 @@
 
 #include "PointCloud.h"
 
-#include <map>
-#include <memory>
-#include <mutex>
+#include <atomic>
+#include <optional>
+#include <set>
+#include <unordered_map>
 
 namespace qh {
-struct FacetAndFarthestVertex {
-  const hull::Facet *facet;
-  std::size_t vertex_index;
-};
-using DistancesFacetsMap =
-    std::multimap<float, FacetAndFarthestVertex, std::greater<float>>;
-
 class DistanceMapper : public hull::Observer {
 public:
   DistanceMapper(const PointCloud &cloud) : cloud(cloud){};
 
-  void update();
+  void processLastUpdate();
 
-  const DistancesFacetsMap &getDistancesFacetsMap() const {
-    return distances_facets_map;
+  struct FacetVertexDistance {
+    const hull::Facet *facet;
+    std::size_t vertex_index;
+    float distance;
+
+    bool operator<(const FacetVertexDistance &o) const {
+      return distance < o.distance;
+    }
+  };
+
+  using Distances = std::multiset<FacetVertexDistance>;
+
+  const FacetVertexDistance *getBest() const {
+    return distances.empty() ? nullptr : &(*distances.rbegin());
+  }
+
+  void hullChanges(const hull::Observer::Notification &notification) override {
+    last_notification.emplace(notification);
   };
 
 protected:
   const PointCloud &cloud;
 
-  std::unique_ptr<Notification> last_notification;
-  void hullChanges(Notification &&notification) override {
-    last_notification = std::make_unique<Notification>(std::move(notification));
-  };
+  std::optional<hull::Observer::Notification> last_notification;
 
-  void updateAddedFacet(const hull::Facet *facet);
-  void updateChangedFacet(const hull::Facet *facet);
-  void updateRemovedFacet(const hull::Facet *facet);
+  std::atomic_bool spin_lock = true;
+  std::unordered_map<const hull::Facet *, Distances::iterator> facets_table;
+  Distances distances;
 
-  std::mutex maps_mtx;
-  DistancesFacetsMap distances_facets_map;
-  std::map<const hull::Facet *, float> facets_distances_map;
+  std::optional<FacetVertexDistance> recompute(const hull::Facet *facet) const;
 };
 } // namespace qh

@@ -5,7 +5,8 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include <Logger.h>
+#include <Utils.h>
+
 #include <iostream>
 
 int main() {
@@ -23,8 +24,8 @@ int main() {
   logConvexhull(convex_hull_facets_incidences, convex_hull_normals, cloud,
                 "Sample01.json");
 
-  std::cout << "call 'python Plotter.py Sample01.json' to see results"
-            << std::endl;
+  std::cout << "call '" << PYTHON_CMD
+            << " Plotter.py Sample01.json' to see results" << std::endl;
 
   return EXIT_SUCCESS;
 }
