@@ -9,63 +9,66 @@
 #include <omp.h>
 
 namespace qh {
-
-void DistanceMapper::updateAddedFacet(const hull::Facet *facet) {
-  auto result = cloud.getFarthest(
-      last_notification->context.vertices[facet->vertexA], facet->normal);
-  if (std::nullopt != result) {
-    std::scoped_lock map_lock(maps_mtx);
-    facets_distances_map[facet] = result->distance;
-    distances_facets_map.emplace(result->distance,
-                                 FacetAndFarthestVertex{facet, result->vertex});
-  }
-}
-
-void DistanceMapper::updateChangedFacet(const hull::Facet *facet) {
-  auto result = cloud.getFarthest(
-      last_notification->context.vertices[facet->vertexA], facet->normal);
-  updateRemovedFacet(facet);
-  if (std::nullopt != result) {
-    std::scoped_lock map_lock(maps_mtx);
-    facets_distances_map[facet] = result->distance;
-    distances_facets_map.emplace(result->distance,
-                                 FacetAndFarthestVertex{facet, result->vertex});
-  }
-}
-
-void DistanceMapper::updateRemovedFacet(const hull::Facet *facet) {
-  std::scoped_lock map_lock(maps_mtx);
-  auto facets_distances_map_it = facets_distances_map.find(facet);
-  if (facets_distances_map_it == facets_distances_map.end()) {
-    return;
-  }
-  auto range =
-      distances_facets_map.equal_range(facets_distances_map_it->second);
-  for (auto distances_facets_map_it = range.first;
-       distances_facets_map_it != range.second; ++distances_facets_map_it) {
-    if (distances_facets_map_it->second.facet == facet) {
-      distances_facets_map.erase(distances_facets_map_it);
-      break;
+namespace {
+struct Guard {
+  Guard(std::atomic_bool &lock) : lock_{lock} {
+    while (true) {
+      bool expected = true;
+      if (lock_.compare_exchange_strong(
+              expected, false, std::memory_order::memory_order_acquire)) {
+        break;
+      }
     }
   }
-  facets_distances_map.erase(facets_distances_map_it);
+  ~Guard() { lock_.store(true, std::memory_order::memory_order_release); }
+
+private:
+  std::atomic_bool &lock_;
+};
+} // namespace
+
+std::optional<DistanceMapper::FacetVertexDistance>
+DistanceMapper::recompute(const hull::Facet *facet) const {
+  const auto &point = last_notification->context.vertices[facet->vertexA];
+  auto info = cloud.getFarthest(point, facet->normal);
+  std::optional<FacetVertexDistance> res;
+  if (info.has_value()) {
+    res.emplace(FacetVertexDistance{facet, info->vertex, info->distance});
+  }
+  return res;
 }
 
-void DistanceMapper::update() {
-// changed facets
+void DistanceMapper::processLastUpdate() {
+  // changed facets
 #pragma omp for
   for (int i = 0; i < last_notification->changed.size(); ++i) {
-    updateChangedFacet(last_notification->changed[i]);
+    const auto *facet = last_notification->changed[i];
+    auto info = recompute(facet);
+    Guard guard{spin_lock};
+    auto it = facets_table.find(facet);
+    distances.erase(it->second);
+    if (info.has_value()) {
+      it->second = distances.emplace(info.value());
+    }
   }
   // added facets
 #pragma omp for
   for (int i = 0; i < last_notification->added.size(); ++i) {
-    updateAddedFacet(last_notification->added[i]);
+    const auto *facet = last_notification->added[i];
+    auto info = recompute(facet);
+    if (info.has_value()) {
+      Guard guard{spin_lock};
+      facets_table[facet] = distances.emplace(info.value());
+    }
   }
-// removed facets
+  // removed facets
 #pragma omp for
   for (int i = 0; i < last_notification->removed.size(); ++i) {
-    updateRemovedFacet(last_notification->removed[i].get());
+    const auto *facet = last_notification->removed[i];
+    Guard guard{spin_lock};
+    auto it = facets_table.find(facet);
+    distances.erase(it->second);
+    facets_table.erase(it);
   }
 }
 } // namespace qh

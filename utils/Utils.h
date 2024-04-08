@@ -9,6 +9,7 @@
 
 #include <QuickHull/FastQuickHull.h>
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -33,9 +34,16 @@ private:
 
 hull::Coordinate to_hull_coordinate(const Vector3d &to_convert);
 
+std::vector<Vector3d> sampleCloud(const std::size_t size);
+
 void logConvexhull(const std::vector<qh::FacetIncidences> &facets_incidences,
                    const std::vector<hull::Coordinate> &convex_hull_normals,
                    const std::vector<Vector3d> &cloud,
                    const std::string &fileName);
 
-std::vector<Vector3d> sampleCloud(const std::size_t size);
+/** @brief Import an .STL file (https://en.wikipedia.org/wiki/STL_(file_format)
+ * as a point cloud of vertices.
+ */
+std::vector<Vector3d> importAnimalStl(const std::string &animalName);
+
+std::filesystem::path getAnimalStlPath(const std::string &animalName);

@@ -5,7 +5,8 @@
  * report any bug to andrecasa91@gmail.com.
  **/
 
-#include <ImporterSTL.h>
+#include <Utils.h>
+
 #include <iostream>
 
 int main() {
@@ -22,12 +23,11 @@ int main() {
   stlNames.push_back("Snake");   // 3691 vertices
   stlNames.push_back("Eagle");   // 4271 vertices
 
-  for (auto it = stlNames.begin(); it != stlNames.end(); ++it) {
-    std::cout << "computing convex hull of " << *it;
+  for (const auto &name : stlNames) {
+    std::cout << "computing convex hull of " << name;
 
     // import the stl describing the shape of this animal
-    const std::string stl_location = getAnimalSTLLocation(*it);
-    const auto vertices_cloud = importSTL(stl_location);
+    const auto vertices_cloud = importAnimalStl(name);
 
     // compute the convex hull of of the imported vertices cloud
     std::vector<hull::Coordinate> convex_hull_normals;
@@ -38,10 +38,10 @@ int main() {
     // Log the result into a textual file, which can be visualized
     // running the python script Plotter.py
     logConvexhull(convex_hull_facets_incidences, convex_hull_normals,
-                  vertices_cloud, *it + ".json");
+                  vertices_cloud, name + ".json");
     std::cout << " done" << std::endl;
-    std::cout << "call 'python Plotter.py " << *it << ".json " << stl_location
-              << "' to see results" << std::endl
+    std::cout << "call '" << PYTHON_CMD << " Plotter.py " << name << ".json "
+              << getAnimalStlPath(name) << "' to see results" << std::endl
               << std::endl;
   }
 

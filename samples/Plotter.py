@@ -12,10 +12,7 @@ from matplotlib import pyplot
 
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
-import json
-import sys
-
-
+import json, sys, os
 
 def get_json_from_file(name):
     with open(name) as json_file:
@@ -77,10 +74,17 @@ def plot_STL(file, ax):
     scale = your_mesh.points.flatten()
     ax.auto_scale_xyz(scale, scale, scale)
 
+def getPathName(filename):
+    base = os.path.basename(filename)
+    sep = base.find('.')
+    return base[0:sep]
+
 logName = sys.argv[1]
-stlLocation = sys.argv[2]
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 plot_CH(logName, 'green', ax)
-plot_STL(stlLocation, ax)
+if 2 < len(sys.argv):
+    stlLocation = sys.argv[2]
+    plot_STL(stlLocation, ax)
+ax.set_title(getPathName(logName))
 plt.show()

@@ -2,7 +2,9 @@
 
 #include <Hull/Coordinate.h>
 
+#include <array>
 #include <optional>
+#include <unordered_map>
 #include <vector>
 
 namespace qh {
@@ -10,7 +12,7 @@ class PointCloud {
 public:
   PointCloud(const std::vector<hull::Coordinate> &points);
 
-  std::vector<std::size_t> getInitialTethraedron() const;
+  std::array<std::size_t, 4> getInitialTethraedron() const;
 
   struct FarthestVertex {
     std::size_t vertex;
@@ -20,15 +22,15 @@ public:
   getFarthest(const hull::Coordinate &point_on_facet,
               const hull::Coordinate &facet_normal) const;
 
-  const hull::Coordinate &accessVertex(const std::size_t index) const {
-    return points[index];
-  }
-  void invalidateVertex(const std::size_t index) {
-    points_still_free[index] = false;
+  void closeVertex(std::size_t index) {
+    const auto *to_close = &points[index];
+    open_set.erase(to_close);
   };
 
+  const std::vector<hull::Coordinate> &points;
+
 private:
-  const std::vector<hull::Coordinate> points;
-  std::vector<bool> points_still_free;
+  // <vertex , index in points>
+  std::unordered_map<const hull::Coordinate *, std::size_t> open_set;
 };
 } // namespace qh
