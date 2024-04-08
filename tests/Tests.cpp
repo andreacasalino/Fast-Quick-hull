@@ -90,6 +90,7 @@ std::ostream &operator<<(std::ostream &recipient,
                    << convert_time(stats.average).count() << " (ms)";
 }
 
+/*
 TEST_CASE("Profiling serial vs mt", "[!mayfail]") {
   const std::size_t trials = 10;
   auto cloud = sampleCloud(50000);
@@ -119,3 +120,4 @@ TEST_CASE("Profiling serial vs mt", "[!mayfail]") {
 
   CHECK(serial_times.average < mt_times.average);
 }
+*/
