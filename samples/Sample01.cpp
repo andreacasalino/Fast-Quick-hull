@@ -25,7 +25,7 @@ int main() {
                 "Sample01.json");
 
   std::cout << "call '" << PYTHON_CMD
-            << " Plotter.py Sample01.json' to see results" << std::endl;
+            << " Plotter.py --CH Sample01.json' to see results" << std::endl;
 
   return EXIT_SUCCESS;
 }
