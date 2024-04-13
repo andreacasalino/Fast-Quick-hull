@@ -40,8 +40,9 @@ int main() {
     logConvexhull(convex_hull_facets_incidences, convex_hull_normals,
                   vertices_cloud, name + ".json");
     std::cout << " done" << std::endl;
-    std::cout << "call '" << PYTHON_CMD << " Plotter.py " << name << ".json "
-              << getAnimalStlPath(name) << "' to see results" << std::endl
+    std::cout << "call '" << PYTHON_CMD << " Plotter.py --CH " << name
+              << ".json --STL " << getAnimalStlPath(name) << "' to see results"
+              << std::endl
               << std::endl;
   }
 

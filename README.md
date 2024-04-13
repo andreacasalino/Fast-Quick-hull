@@ -9,13 +9,11 @@ This library is stand-alone and completely **cross platform**. Use [CMake](https
 
 ## SAMPLES
 
-The relevant code is contained in ./src, while ./samples contains examples showing how to use this library.
-In particular, after running the samples, some .json files will be produced storing the results.
-You can use the python script Plotter.py to visualize results in cool **3d plot**, by running:
+The relevant code is contained in [src](./src), while [samples](./samples) contains examples showing how to use this library.
+When running each sample, a **.json** file will be produced storing the results about the computed **convex hull**.
+[This](./samples/Plotter.py) **python** script can be used to visualize such results. Notice that the sample itself will print in the console the command to run together with the right arguments, in order to visualize the results with such script.
 
- * `python3 Plotter.py ${JSON_TO_PLOT_NAME}`
-
-Note that you may need to use **pip** to install eventually missing python package to make the script run.
+Attention!!!! In order for the visualizing script to run, you may need to install eventually missing python packages.
 
 ## USAGE
 
